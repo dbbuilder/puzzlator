@@ -1,0 +1,101 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+  }
+  
+  body {
+    @apply bg-game-background text-game-text antialiased;
+  }
+  
+  * {
+    @apply border-game-border;
+  }
+}
+
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2;
+  }
+  
+  .btn-primary {
+    @apply btn bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
+  }
+  
+  .btn-secondary {
+    @apply btn bg-game-surface text-game-text border border-game-border hover:bg-slate-700 focus:ring-game-accent;
+  }
+  
+  .btn-ghost {
+    @apply btn text-game-text hover:bg-game-surface focus:ring-game-accent;
+  }
+  
+  .card {
+    @apply bg-game-surface rounded-xl border border-game-border shadow-lg;
+  }
+  
+  .input {
+    @apply w-full px-3 py-2 bg-game-surface border border-game-border rounded-lg text-game-text placeholder-slate-400 focus:border-game-accent focus:ring-1 focus:ring-game-accent;
+  }
+  
+  .puzzle-grid {
+    @apply grid gap-1 p-4 bg-game-surface rounded-xl border border-game-border;
+  }
+  
+  .puzzle-cell {
+    @apply aspect-square flex items-center justify-center bg-slate-700 border border-game-border rounded cursor-pointer transition-all duration-150 hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-game-accent;
+  }
+  
+  .puzzle-cell.selected {
+    @apply bg-game-accent ring-2 ring-game-accent ring-offset-2 ring-offset-game-background;
+  }
+  
+  .puzzle-cell.invalid {
+    @apply bg-red-900 border-red-500 text-red-200;
+  }
+  
+  .puzzle-cell.valid {
+    @apply bg-green-900 border-green-500 text-green-200;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary-400 to-game-accent bg-clip-text text-transparent;
+  }
+  
+  .glass {
+    @apply bg-white/10 backdrop-blur-sm border border-white/20;
+  }
+  
+  .game-shadow {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  
+  .animate-pulse-glow {
+    animation: pulseGlow 2s ease-in-out infinite alternate;
+  }
+}
+
+@keyframes pulseGlow {
+  from {
+    box-shadow: 0 0 5px #06b6d4, 0 0 10px #06b6d4, 0 0 15px #06b6d4;
+  }
+  to {
+    box-shadow: 0 0 10px #06b6d4, 0 0 20px #06b6d4, 0 0 30px #06b6d4;
+  }
+}
+
+/* Game-specific animations */
+.puzzle-solve-animation {
+  animation: solvePulse 0.6s ease-out;
+}
+
+@keyframes solvePulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
