@@ -64,8 +64,22 @@ Create the ultimate puzzle game experience where artificial intelligence generat
 ## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js 18+ and npm
-- Supabase account (free tier available)
+- Node.js 18+ and npm 8+
+- A Supabase account ([sign up free](https://supabase.com))
+- An OpenAI API key for puzzle generation
+
+### Environment Setup
+1. Copy the environment template:
+   ```bash
+   cp .env.example .env.local
+   ```
+
+2. Fill in your environment variables:
+   - `VITE_SUPABASE_URL`: Your Supabase project URL
+   - `VITE_SUPABASE_ANON_KEY`: Your Supabase anon/public key
+   - `OPENAI_API_KEY`: Your OpenAI API key (for edge functions)
+
+### Installation
 - OpenAI API key
 - Git for version control
 
