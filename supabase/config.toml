@@ -1,8 +1,4 @@
-# Supabase Configuration
-
-[project]
-# A unique project ID
-id = "puzzler-local"
+# A config.toml file is required for local development with Supabase CLI
 
 [api]
 # Port for the API gateway
@@ -15,81 +11,52 @@ extra_search_path = ["public", "extensions"]
 max_rows = 1000
 
 [auth]
-# Auth server URL
+# The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
+# in emails.
 site_url = "http://localhost:3000"
-# Additional redirect URLs
+# A list of *exact* URLs that auth providers are permitted to redirect to post authentication.
 additional_redirect_urls = ["http://localhost:3000/auth/callback"]
-# JWT expiry time
-jwt_expiry_limit = 3600
-# Enable signup
-enable_signup = true
-# Enable anonymous sign-ins
-enable_anonymous_sign_ins = true
+# How long tokens are valid for, in seconds. Defaults to 3600 (1 hour)
+jwt_expiry = 3600
 
+# Email auth
 [auth.email]
-# Enable email auth
+# Allow/disallow new user signups to your project.
 enable_signup = true
-# Enable email confirmation
-enable_confirmations = false
-# Template for confirmation emails
-template.confirmation = ""
 
-[auth.sms]
-# Enable SMS auth
-enable_signup = false
-# Enable SMS confirmation
-enable_confirmations = false
-
+# External Auth Providers (disabled by default)
 [auth.external.google]
 enabled = false
 client_id = ""
 secret = ""
-redirect_uri = ""
 
 [auth.external.github]
 enabled = false
 client_id = ""
 secret = ""
-redirect_uri = ""
-
-[storage]
-# Storage file size limit (50MB)
-file_size_limit = 52428800
 
 [db]
-# PostgreSQL version
-major_version = 15
-# Database port
+# Port to use for the local database URL.
 port = 14322
 
-[studio]
-# Studio port
-port = 14323
-# API URL for Studio
-api_url = "http://localhost"
+[db.pooler]
+enabled = false
+port = 14329
 
+[studio]
+# Port to use for Supabase Studio.
+port = 14323
+
+# Email testing server (for local development)
 [inbucket]
-# Email testing server port
+# Port to use for the email testing server web interface.
 port = 14324
 
-[realtime]
-# Realtime server port
-port = 14325
-# Enable database changes broadcast
-enabled = true
-# Enable presence broadcast
-presence = true
+[storage]
+# The maximum file size allowed (e.g. "5MB", "500KB").
+file_size_limit = "50MiB"
 
 [analytics]
-# Analytics collection
 enabled = false
-
-# Functions configuration
-[functions."generate-puzzle"]
-verify_jwt = true
-
-[functions."check-achievement"]
-verify_jwt = true
-
-[functions."update-leaderboard"]
-verify_jwt = true
+port = 14327
+backend = "postgres"

@@ -88,7 +88,7 @@ CREATE TABLE game_sessions (
   game_state JSONB, -- Serialized game state for resume
   
   -- Prevent duplicate active sessions
-  UNIQUE(user_id, puzzle_id, status) WHERE status IN ('not_started', 'in_progress')
+  CONSTRAINT unique_active_sessions UNIQUE (user_id, puzzle_id)
 );
 
 -- Achievements table
