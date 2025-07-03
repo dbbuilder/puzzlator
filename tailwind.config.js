@@ -4,6 +4,7 @@ export default {
     "./index.html",
     "./src/**/*.{vue,js,ts,jsx,tsx}",
   ],
+  darkMode: 'class',
   theme: {
     extend: {
       colors: {
@@ -25,7 +26,9 @@ export default {
           surface: '#1e293b',
           border: '#334155',
           text: '#f1f5f9',
+          muted: '#64748b',
           accent: '#06b6d4',
+          'accent-hover': '#0891b2',
           success: '#10b981',
           warning: '#f59e0b',
           error: '#ef4444',

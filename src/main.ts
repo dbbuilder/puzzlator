@@ -10,7 +10,7 @@ import './style.css'
 import 'vue-toastification/dist/index.css'
 
 // Initialize Supabase
-import { supabase } from './utils/supabase'
+import { supabase } from './config/supabase'
 
 // Create Vue app
 const app = createApp(App)
