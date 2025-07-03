@@ -1,0 +1,95 @@
+# Supabase Configuration
+
+[project]
+# A unique project ID
+id = "puzzler-local"
+
+[api]
+# Port for the API gateway
+port = 54321
+# Schemas to expose via the API
+schemas = ["public", "storage", "graphql_public"]
+# Extra schemas to add to the search_path
+extra_search_path = ["public", "extensions"]
+# Maximum rows returned by API
+max_rows = 1000
+
+[auth]
+# Auth server URL
+site_url = "http://localhost:3000"
+# Additional redirect URLs
+additional_redirect_urls = ["http://localhost:3000/auth/callback"]
+# JWT expiry time
+jwt_expiry_limit = 3600
+# Enable signup
+enable_signup = true
+# Enable anonymous sign-ins
+enable_anonymous_sign_ins = true
+
+[auth.email]
+# Enable email auth
+enable_signup = true
+# Enable email confirmation
+enable_confirmations = false
+# Template for confirmation emails
+template.confirmation = ""
+
+[auth.sms]
+# Enable SMS auth
+enable_signup = false
+# Enable SMS confirmation
+enable_confirmations = false
+
+[auth.external.google]
+enabled = false
+client_id = ""
+secret = ""
+redirect_uri = ""
+
+[auth.external.github]
+enabled = false
+client_id = ""
+secret = ""
+redirect_uri = ""
+
+[storage]
+# Storage file size limit (50MB)
+file_size_limit = 52428800
+
+[db]
+# PostgreSQL version
+major_version = 15
+# Database port
+port = 54322
+
+[studio]
+# Studio port
+port = 54323
+# API URL for Studio
+api_url = "http://localhost"
+
+[inbucket]
+# Email testing server port
+port = 54324
+
+[realtime]
+# Realtime server port
+port = 54325
+# Enable database changes broadcast
+enabled = true
+# Enable presence broadcast
+presence = true
+
+[analytics]
+# Analytics collection
+enabled = false
+
+# Functions configuration
+[functions."generate-puzzle"]
+verify_jwt = true
+
+[functions."check-achievement"]
+verify_jwt = true
+
+[functions."update-leaderboard"]
+verify_jwt = true

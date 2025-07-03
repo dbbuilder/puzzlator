@@ -13,7 +13,16 @@
     "test:e2e:dev": "cypress open",
     "type-check": "vue-tsc --noEmit",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix --ignore-path .gitignore",
-    "format": "prettier --write src/"
+    "format": "prettier --write src/",
+    "db:start": "supabase start",
+    "db:stop": "supabase stop",
+    "db:reset": "supabase db reset",
+    "db:migrate": "supabase migration up",
+    "db:types": "supabase gen types typescript --local > src/types/database.generated.ts",
+    "db:seed": "node scripts/seed-database.js",
+    "setup:supabase": "bash scripts/setup-supabase.sh",
+    "setup:complete": "bash scripts/init-database.sh",
+    "postinstall": "echo 'Run npm run setup:complete to set up the database'"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.39.7",
