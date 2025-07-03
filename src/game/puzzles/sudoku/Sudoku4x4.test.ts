@@ -49,17 +49,31 @@ describe('Sudoku4x4', () => {
       const emptyCell = state.grid.flat().find(cell => cell.value === null)
       
       if (emptyCell) {
+        // Find a valid value for this cell
+        let validValue = null
+        for (let v = 1; v <= 4; v++) {
+          if (sudoku.isValidMove({ row: emptyCell.row, col: emptyCell.col, value: v })) {
+            validValue = v
+            break
+          }
+        }
+        
+        expect(validValue).not.toBeNull() // Ensure we found a valid value
+        
         const move: PuzzleMove = {
           row: emptyCell.row,
           col: emptyCell.col,
-          value: 1
+          value: validValue!
         }
         
         const result = sudoku.makeMove(move)
         expect(result.success).toBe(true)
         
         const newState = sudoku.getState()
-        expect(newState.grid[emptyCell.row][emptyCell.col].value).toBe(1)
+        expect(newState.grid[emptyCell.row][emptyCell.col].value).toBe(validValue)
+      } else {
+        // If no empty cell found, fail the test
+        throw new Error('No empty cell found in puzzle')
       }
     })
 
@@ -239,32 +253,62 @@ describe('Sudoku4x4', () => {
   describe('undo/redo', () => {
     it('should support undoing moves', () => {
       const state = sudoku.getState()
-      const emptyCell = state.grid.flat().find(cell => cell.value === null)
+      const emptyCell = state.grid.flat().find(cell => cell.value === null && !cell.locked)
       
       if (emptyCell) {
+        // Find a valid value for this cell
+        let validValue = null
+        for (let v = 1; v <= 4; v++) {
+          if (sudoku.isValidMove({ row: emptyCell.row, col: emptyCell.col, value: v })) {
+            validValue = v
+            break
+          }
+        }
+        
+        expect(validValue).not.toBeNull()
+        
         // Make a move
-        sudoku.makeMove({ row: emptyCell.row, col: emptyCell.col, value: 1 })
-        expect(sudoku.getState().grid[emptyCell.row][emptyCell.col].value).toBe(1)
+        const result = sudoku.makeMove({ row: emptyCell.row, col: emptyCell.col, value: validValue })
+        expect(result.success).toBe(true)
+        expect(sudoku.getState().grid[emptyCell.row][emptyCell.col].value).toBe(validValue)
         
         // Undo the move
         const undoResult = sudoku.undo()
         expect(undoResult).toBe(true)
         expect(sudoku.getState().grid[emptyCell.row][emptyCell.col].value).toBe(null)
+      } else {
+        throw new Error('No empty unlocked cell found')
       }
     })
 
     it('should support redoing moves', () => {
       const state = sudoku.getState()
-      const emptyCell = state.grid.flat().find(cell => cell.value === null)
+      const emptyCell = state.grid.flat().find(cell => cell.value === null && !cell.locked)
       
       if (emptyCell) {
+        // Find a valid value for this cell
+        let validValue = null
+        for (let v = 1; v <= 4; v++) {
+          if (sudoku.isValidMove({ row: emptyCell.row, col: emptyCell.col, value: v })) {
+            validValue = v
+            break
+          }
+        }
+        
+        expect(validValue).not.toBeNull()
+        
         // Make a move, undo it, then redo it
-        sudoku.makeMove({ row: emptyCell.row, col: emptyCell.col, value: 1 })
+        const result = sudoku.makeMove({ row: emptyCell.row, col: emptyCell.col, value: validValue })
+        expect(result.success).toBe(true)
+        
         sudoku.undo()
+        expect(sudoku.getState().grid[emptyCell.row][emptyCell.col].value).toBe(null)
         
         const redoResult = sudoku.redo()
         expect(redoResult).toBe(true)
-        expect(sudoku.getState().grid[emptyCell.row][emptyCell.col].value).toBe(1)
+        expect(sudoku.getState().grid[emptyCell.row][emptyCell.col].value).toBe(validValue)
+      } else {
+        throw new Error('No empty unlocked cell found')
       }
     })
   })
