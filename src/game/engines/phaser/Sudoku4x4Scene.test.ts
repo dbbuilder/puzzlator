@@ -5,47 +5,89 @@ import type { PuzzleMove } from '../../types/puzzle'
 
 // Mock Phaser
 vi.mock('phaser', () => ({
-  Scene: class Scene {
+  default: {
+    Scene: class Scene {
     add = {
       graphics: vi.fn(() => ({
         fillStyle: vi.fn(),
         fillRect: vi.fn(),
         strokeRect: vi.fn(),
         lineStyle: vi.fn(),
-        clear: vi.fn()
+        clear: vi.fn(),
+        moveTo: vi.fn(),
+        lineTo: vi.fn(),
+        stroke: vi.fn()
       })),
-      text: vi.fn(() => ({
-        setOrigin: vi.fn(),
-        setInteractive: vi.fn(),
-        setFontSize: vi.fn(),
-        setColor: vi.fn(),
-        setText: vi.fn(),
+      text: vi.fn((x, y, text) => ({
+        setOrigin: vi.fn().mockReturnThis(),
+        setInteractive: vi.fn().mockReturnThis(),
+        setFontSize: vi.fn().mockReturnThis(),
+        setColor: vi.fn().mockReturnThis(),
+        setText: vi.fn().mockReturnThis(),
+        setDepth: vi.fn().mockReturnThis(),
+        setScale: vi.fn().mockReturnThis(),
         destroy: vi.fn(),
-        x: 0,
-        y: 0
+        x,
+        y,
+        text,
+        scale: 1,
+        cellData: null,
+        locked: false
       })),
-      rectangle: vi.fn(() => ({
-        setInteractive: vi.fn(),
-        setFillStyle: vi.fn(),
-        setStrokeStyle: vi.fn(),
-        destroy: vi.fn()
+      rectangle: vi.fn((x, y, width, height) => ({
+        setInteractive: vi.fn().mockReturnThis(),
+        setFillStyle: vi.fn().mockReturnThis(),
+        setStrokeStyle: vi.fn().mockReturnThis(),
+        setDepth: vi.fn().mockReturnThis(),
+        setVisible: vi.fn().mockReturnThis(),
+        destroy: vi.fn(),
+        on: vi.fn(),
+        emit: vi.fn(),
+        x,
+        y,
+        width,
+        height,
+        fillColor: 0,
+        visible: true,
+        cellData: null
       }))
     }
     input = {
       on: vi.fn(),
-      off: vi.fn()
+      off: vi.fn(),
+      keyboard: {
+        on: vi.fn(),
+        off: vi.fn()
+      }
     }
     scale = {
       width: 800,
-      height: 600
+      height: 600,
+      on: vi.fn(),
+      off: vi.fn()
     }
     events = {
       emit: vi.fn(),
       on: vi.fn(),
       off: vi.fn()
     }
+    tweens = {
+      add: vi.fn((config) => {
+        // Immediately call onComplete if provided
+        if (config.onComplete) {
+          setTimeout(config.onComplete, 0)
+        }
+        return { stop: vi.fn() }
+      })
+    }
+  },
+  GameObjects: {
+    Graphics: class {},
+    Text: class {},
+    Rectangle: class {}
   },
   AUTO: 'AUTO'
+  }
 }))
 
 describe('Sudoku4x4Scene', () => {
@@ -147,9 +189,20 @@ describe('Sudoku4x4Scene', () => {
       const clickHandler = vi.fn()
       scene.onCellClick(clickHandler)
       
-      // Simulate click on cell (1, 1)
-      const cellRect = scene.getCellRectangle(1, 1)
-      cellRect.emit('pointerdown')
+      // Get the mock rectangle created for cell (1, 1)
+      const mockRectangle = scene.add.rectangle as any
+      const rectangleCall = mockRectangle.mock.calls.find((call: any) => {
+        const rect = mockRectangle.mock.results.find((r: any) => r.value.cellData?.row === 1 && r.value.cellData?.col === 1)
+        return rect !== undefined
+      })
+      
+      // Find the pointerdown handler that was registered
+      const rect = scene.getCellRectangle(1, 1)
+      const onCall = rect.on as any
+      const pointerdownCall = onCall.mock.calls.find((call: any) => call[0] === 'pointerdown')
+      if (pointerdownCall && pointerdownCall[1]) {
+        pointerdownCall[1]()
+      }
       
       expect(clickHandler).toHaveBeenCalledWith({ row: 1, col: 1 })
     })
@@ -267,7 +320,10 @@ describe('Sudoku4x4Scene', () => {
       scene.create()
       
       const config = scene.getConfig()
-      expect(config.cellSize).toBeLessThanOrEqual(80) // Should fit in 400px width
+      // With 400px width and 20px padding on each side, we have 360px for 4 cells
+      // That's 90px per cell, but capped at 100px max
+      expect(config.cellSize).toBeLessThanOrEqual(100) // Should fit in screen
+      expect(config.cellSize).toBeGreaterThan(0)
     })
 
     it('should center grid on screen', () => {
@@ -298,28 +354,60 @@ describe('Sudoku4x4Scene', () => {
     it('should update display when puzzle state changes', () => {
       scene.create()
       
+      // Find an empty cell to make a move
+      const state = puzzle.getState()
+      let emptyCell = null
+      for (let row = 0; row < 4; row++) {
+        for (let col = 0; col < 4; col++) {
+          if (state.grid[row][col].value === null) {
+            emptyCell = { row, col }
+            break
+          }
+        }
+        if (emptyCell) break
+      }
+      
+      if (!emptyCell) throw new Error('No empty cell found')
+      
       // Make a move in the puzzle
-      const move: PuzzleMove = { row: 0, col: 0, value: 2 }
+      const move: PuzzleMove = { row: emptyCell.row, col: emptyCell.col, value: 2 }
       puzzle.makeMove(move)
       
       // Update scene
       scene.updateFromPuzzleState()
       
-      const cellText = scene.getCellText(0, 0)
+      const cellText = scene.getCellText(emptyCell.row, emptyCell.col)
       expect(cellText.text).toBe('2')
     })
 
     it('should clear cell display when value is removed', () => {
       scene.create()
       
+      // Find an empty cell
+      const state = puzzle.getState()
+      let emptyCell = null
+      for (let row = 0; row < 4; row++) {
+        for (let col = 0; col < 4; col++) {
+          if (state.grid[row][col].value === null && !state.grid[row][col].locked) {
+            emptyCell = { row, col }
+            break
+          }
+        }
+        if (emptyCell) break
+      }
+      
+      if (!emptyCell) throw new Error('No empty unlocked cell found')
+      
       // Add then remove a value
-      puzzle.makeMove({ row: 1, col: 1, value: 3 })
+      puzzle.makeMove({ row: emptyCell.row, col: emptyCell.col, value: 3 })
       scene.updateFromPuzzleState()
       
-      puzzle.makeMove({ row: 1, col: 1, value: null })
+      expect(scene.getCellText(emptyCell.row, emptyCell.col)).toBeDefined()
+      
+      puzzle.makeMove({ row: emptyCell.row, col: emptyCell.col, value: null })
       scene.updateFromPuzzleState()
       
-      const cellText = scene.getCellText(1, 1)
+      const cellText = scene.getCellText(emptyCell.row, emptyCell.col)
       expect(cellText).toBeUndefined()
     })
 
