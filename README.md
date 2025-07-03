@@ -65,11 +65,11 @@ Create the ultimate puzzle game experience where artificial intelligence generat
 
 ### Prerequisites
 - Node.js 18+ and npm 8+
-- A Supabase account ([sign up free](https://supabase.com))
-- An OpenAI API key for puzzle generation
+- Docker Desktop ([download](https://www.docker.com/products/docker-desktop/))
 - Git for version control
+- OpenAI API key (optional, for AI puzzle generation)
 
-### Quick Setup
+### Quick Setup (Automated)
 ```bash
 # Clone the repository
 git clone https://github.com/dbbuilder/puzzler.git
@@ -78,21 +78,56 @@ cd puzzler
 # Install dependencies
 npm install
 
-# Set up environment variables
-cp .env.local.example .env.local
-# Edit .env.local with your API keys
+# Set up database and environment (requires Docker running)
+npm run setup:complete
 
 # Start development server
 npm run dev
 
 # Open browser to http://localhost:3000
+# Login with test@example.com / testpassword123
+```
+
+### Manual Setup
+```bash
+# 1. Install dependencies
+npm install
+
+# 2. Copy environment template
+cp .env.local.example .env.local
+
+# 3. Start Supabase (requires Docker)
+npm run db:start
+
+# 4. Run database setup
+npm run db:reset
+npm run db:types
+npm run db:seed
+
+# 5. Start development server
+npm run dev
 ```
 
 ### Environment Configuration
+The automated setup creates these for you, but for production:
 ```env
 VITE_SUPABASE_URL=your_supabase_project_url
 VITE_SUPABASE_ANON_KEY=your_supabase_anon_key
 OPENAI_API_KEY=your_openai_api_key
+```
+
+### Database Commands
+```bash
+# Database management
+npm run db:start      # Start local Supabase
+npm run db:stop       # Stop local Supabase
+npm run db:reset      # Reset and migrate database
+npm run db:migrate    # Run pending migrations
+npm run db:seed       # Seed with sample data
+npm run db:types      # Generate TypeScript types
+
+# Complete setup/reset
+npm run setup:complete  # Full automated setup
 ```
 
 ## 📁 Project Structure
