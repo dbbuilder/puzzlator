@@ -6,7 +6,7 @@ id = "puzzler-local"
 
 [api]
 # Port for the API gateway
-port = 54321
+port = 14321
 # Schemas to expose via the API
 schemas = ["public", "storage", "graphql_public"]
 # Extra schemas to add to the search_path
@@ -60,21 +60,21 @@ file_size_limit = 52428800
 # PostgreSQL version
 major_version = 15
 # Database port
-port = 54322
+port = 14322
 
 [studio]
 # Studio port
-port = 54323
+port = 14323
 # API URL for Studio
 api_url = "http://localhost"
 
 [inbucket]
 # Email testing server port
-port = 54324
+port = 14324
 
 [realtime]
 # Realtime server port
-port = 54325
+port = 14325
 # Enable database changes broadcast
 enabled = true
 # Enable presence broadcast

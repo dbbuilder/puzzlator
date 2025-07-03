@@ -45,14 +45,17 @@ wait_for_service() {
 
 # 1. Check if Supabase CLI is installed
 if ! command -v supabase &> /dev/null; then
-    echo -e "${YELLOW}Installing Supabase CLI...${NC}"
-    npm install -g supabase
+    echo -e "${YELLOW}Installing Supabase CLI locally...${NC}"
+    npm install --save-dev supabase
+    
+    # Create alias for this session
+    alias supabase='npx supabase'
 fi
 
 # 2. Initialize Supabase if needed
 if [ ! -d "supabase" ]; then
     echo -e "${YELLOW}Initializing Supabase...${NC}"
-    supabase init
+    npx supabase init
 fi
 
 # 3. Check Docker
@@ -63,15 +66,15 @@ fi
 
 # 4. Stop any existing Supabase instance
 echo -e "${YELLOW}Stopping any existing Supabase instance...${NC}"
-supabase stop --backup false 2>/dev/null || true
+npx supabase stop --backup false 2>/dev/null || true
 
 # 5. Start Supabase
 echo -e "${YELLOW}Starting Supabase local instance...${NC}"
-supabase start
+npx supabase start
 
 # 6. Wait for services to be ready
-wait_for_service "http://localhost:54321/rest/v1/" "Supabase API"
-wait_for_service "http://localhost:54323" "Supabase Studio"
+wait_for_service "http://localhost:14321/rest/v1/" "Supabase API"
+wait_for_service "http://localhost:14323" "Supabase Studio"
 
 # 7. Get credentials and update .env.local
 echo -e "${YELLOW}Updating .env.local with local credentials...${NC}"
@@ -109,7 +112,7 @@ fi
 
 # 8. Run migrations
 echo -e "${YELLOW}Running database migrations...${NC}"
-supabase db reset --linked
+npx supabase db reset
 
 # 9. Generate TypeScript types
 echo -e "${YELLOW}Generating TypeScript types...${NC}"
@@ -123,7 +126,7 @@ node scripts/seed-database.js
 echo ""
 echo -e "${GREEN}✅ Database initialization complete!${NC}"
 echo ""
-echo "📊 Supabase Studio: http://localhost:54323"
+echo "📊 Supabase Studio: http://localhost:14323"
 echo "🔌 API URL: $API_URL"
 echo ""
 echo "Test credentials:"

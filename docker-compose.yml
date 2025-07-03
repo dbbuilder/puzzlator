@@ -8,7 +8,7 @@ services:
   postgres:
     image: supabase/postgres:15.1.0.55
     ports:
-      - "54322:5432"
+      - "14322:5432"
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: postgres
@@ -24,7 +24,7 @@ services:
   studio:
     image: supabase/studio:latest
     ports:
-      - "54323:3000"
+      - "14323:3000"
     environment:
       STUDIO_PG_META_URL: http://meta:8080
       POSTGRES_PASSWORD: postgres
@@ -43,7 +43,7 @@ services:
     environment:
       GOTRUE_API_HOST: 0.0.0.0
       GOTRUE_API_PORT: 9999
-      API_EXTERNAL_URL: http://localhost:54321
+      API_EXTERNAL_URL: http://localhost:14321
       GOTRUE_DB_DRIVER: postgres
       GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:postgres@postgres:5432/postgres
       GOTRUE_SITE_URL: http://localhost:3000
@@ -62,7 +62,7 @@ services:
   rest:
     image: postgrest/postgrest:v11.2.0
     ports:
-      - "54321:3000"
+      - "14321:3000"
     environment:
       PGRST_DB_URI: postgres://authenticator:postgres@postgres:5432/postgres
       PGRST_DB_SCHEMAS: public,storage,graphql_public
@@ -77,7 +77,7 @@ services:
   realtime:
     image: supabase/realtime:v2.25.35
     ports:
-      - "54324:4000"
+      - "14324:4000"
     environment:
       PORT: 4000
       DB_HOST: postgres

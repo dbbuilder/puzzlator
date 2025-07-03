@@ -45,9 +45,9 @@ supabase start
 ```
 
 This will start:
-- PostgreSQL database on port 54322
-- Supabase Studio on http://localhost:54323
-- API Gateway on http://localhost:54321
+- PostgreSQL database on port 14322
+- Supabase Studio on http://localhost:14323
+- API Gateway on http://localhost:14321
 
 ### 4. Run Migrations
 
@@ -126,9 +126,9 @@ Default test user:
 - On Windows, ensure WSL 2 is properly configured
 
 ### Port conflicts
-- PostgreSQL: 54322 (default 5432)
-- Studio: 54323
-- API: 54321
+- PostgreSQL: 14322 (default 5432)
+- Studio: 14323
+- API: 14321
 
 ### Reset everything
 ```bash
@@ -140,7 +140,7 @@ supabase db reset
 
 Required in `.env.local`:
 ```env
-VITE_SUPABASE_URL=http://localhost:54321
+VITE_SUPABASE_URL=http://localhost:14321
 VITE_SUPABASE_ANON_KEY=your-anon-key
 SUPABASE_SERVICE_ROLE_KEY=your-service-key
 ```
