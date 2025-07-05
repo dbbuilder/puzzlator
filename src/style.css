@@ -14,6 +14,24 @@
   * {
     @apply border-game-border;
   }
+  
+  /* Override Tailwind Forms plugin defaults */
+  [type='text'],
+  [type='email'],
+  [type='url'],
+  [type='password'],
+  [type='number'],
+  [type='date'],
+  [type='datetime-local'],
+  [type='month'],
+  [type='search'],
+  [type='tel'],
+  [type='time'],
+  [type='week'],
+  textarea,
+  select {
+    @apply text-gray-900;
+  }
 }
 
 @layer components {
