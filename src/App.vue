@@ -22,30 +22,30 @@
       </main>
       
       <!-- Footer -->
-      <AppFooter v-if="showNavigation" />
+      <!-- <AppFooter v-if="showNavigation" /> -->
     </div>
 
     <!-- Global modals and overlays -->
-    <ErrorModal />
-    <AuthModal />
+    <!-- <ErrorModal /> -->
+    <!-- <AuthModal /> -->
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import { useAppStore } from '@/stores/app'
+import { useUserStore } from '@/stores/user'
+// import { useAppStore } from '@/stores/app'
 
-// Import components (these will be created later)
+// Import components
 import AppNavigation from '@/components/layout/AppNavigation.vue'
-import AppFooter from '@/components/layout/AppFooter.vue'
-import ErrorModal from '@/components/modals/ErrorModal.vue'
-import AuthModal from '@/components/modals/AuthModal.vue'
+// import AppFooter from '@/components/layout/AppFooter.vue'
+// import ErrorModal from '@/components/modals/ErrorModal.vue'
+// import AuthModal from '@/components/modals/AuthModal.vue'
 
 // Stores
-const authStore = useAuthStore()
-const appStore = useAppStore()
+const userStore = useUserStore()
+// const appStore = useAppStore()
 const route = useRoute()
 
 // Reactive state
@@ -54,25 +54,25 @@ const isLoading = ref(true)
 // Computed properties
 const showNavigation = computed(() => {
   // Hide navigation on auth pages and game pages
-  const hideOnRoutes = ['/login', '/signup', '/game']
+  const hideOnRoutes = ['/login', '/signup']
   return !hideOnRoutes.some(routePath => route.path.startsWith(routePath))
 })
 
 // Lifecycle
 onMounted(async () => {
   try {
-    // Initialize authentication
-    await authStore.initialize()
+    // Initialize user store
+    // await userStore.loadProfile()
     
     // Initialize app settings
-    await appStore.initialize()
+    // await appStore.initialize()
     
     // Preload critical resources
     await preloadResources()
     
   } catch (error) {
     console.error('Failed to initialize app:', error)
-    appStore.setError('Failed to initialize application. Please refresh the page.')
+    // appStore.setError('Failed to initialize application. Please refresh the page.')
   } finally {
     isLoading.value = false
   }

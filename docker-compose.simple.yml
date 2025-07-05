@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  # PostgreSQL database only - simpler setup
+  postgres:
+    image: postgres:15
+    container_name: puzzler_db
+    ports:
+      - "14322:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: puzzler
+    volumes:
+      - ./supabase/migrations:/docker-entrypoint-initdb.d
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - puzzler_network
+
+  # pgAdmin for database management (optional)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: puzzler_pgadmin
+    ports:
+      - "14323:80"
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@puzzler.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - puzzler_network
+
+networks:
+  puzzler_network:
+    driver: bridge
+
+volumes:
+  postgres_data:
+  pgadmin_data:

@@ -2,7 +2,8 @@
 import { config } from '@vue/test-utils'
 import { vi } from 'vitest'
 
-// Mock Supabase client
+// Supabase mocks disabled - using custom auth
+/*
 vi.mock('@supabase/supabase-js', () => ({
   createClient: vi.fn(() => ({
     auth: {
@@ -24,6 +25,7 @@ vi.mock('@supabase/supabase-js', () => ({
     },
   })),
 }))
+*/
 
 // Mock OpenAI client
 vi.mock('openai', () => ({
@@ -55,8 +57,9 @@ config.global.mocks = {
 // Setup environment variables for tests
 Object.defineProperty(window, 'ENV', {
   value: {
-    VITE_SUPABASE_URL: 'https://test.supabase.co',
-    VITE_SUPABASE_ANON_KEY: 'test-key',
+    // Supabase disabled - using custom auth
+    // VITE_SUPABASE_URL: 'https://test.supabase.co',
+    // VITE_SUPABASE_ANON_KEY: 'test-key',
     VITE_APP_NAME: 'Test Puzzler',
     VITE_APP_VERSION: '1.0.0',
     VITE_APP_ENV: 'test',

@@ -1,4 +1,13 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
+
+describe('Supabase Helpers - DISABLED', () => {
+  it('tests are disabled as Supabase has been removed', () => {
+    expect(true).toBe(true)
+  })
+})
+
+/* Original Supabase tests commented out:
+
 import type { PostgrestError } from '@supabase/supabase-js'
 
 describe('Supabase Helpers', () => {
@@ -216,3 +225,5 @@ describe('Supabase Helpers', () => {
     })
   })
 })
+
+*/

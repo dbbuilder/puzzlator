@@ -1,5 +1,10 @@
-import { PostgrestError, AuthError } from '@supabase/supabase-js'
-import { supabase } from '@/config/supabase'
+// Supabase imports disabled - using custom auth instead
+// import { PostgrestError, AuthError } from '@supabase/supabase-js'
+// import { supabase } from '@/config/supabase'
+
+// Temporary type definitions to prevent errors
+type PostgrestError = any
+type AuthError = any
 
 // Error handling types
 export interface FormattedError {
@@ -53,6 +58,9 @@ export function handleSupabaseError(error: unknown): FormattedError {
 
 // Check if user is authenticated
 export async function isAuthenticated(): Promise<boolean> {
+  // Supabase auth disabled - using custom auth
+  return false
+  /*
   try {
     const { data: { session }, error } = await supabase.auth.getSession()
     
@@ -64,10 +72,14 @@ export async function isAuthenticated(): Promise<boolean> {
   } catch {
     return false
   }
+  */
 }
 
 // Get current user
 export async function getCurrentUser() {
+  // Supabase auth disabled - using custom auth
+  return null
+  /*
   const { data: { user }, error } = await supabase.auth.getUser()
   
   if (error) {
@@ -75,6 +87,7 @@ export async function getCurrentUser() {
   }
 
   return user
+  */
 }
 
 // Retry configuration

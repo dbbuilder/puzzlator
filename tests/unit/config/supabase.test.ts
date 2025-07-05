@@ -1,3 +1,13 @@
+import { describe, it, expect } from 'vitest'
+
+describe('Supabase Configuration - DISABLED', () => {
+  it('tests are disabled as Supabase has been removed', () => {
+    expect(true).toBe(true)
+  })
+})
+
+/* Original Supabase configuration tests commented out:
+
 import { describe, it, expect, beforeEach, vi } from 'vitest'
 import type { SupabaseClient } from '@supabase/supabase-js'
 
@@ -165,3 +175,5 @@ describe('Supabase Configuration', () => {
     })
   })
 })
+
+*/

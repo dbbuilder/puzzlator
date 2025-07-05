@@ -5,37 +5,30 @@ import type { RouteRecordRaw } from 'vue-router'
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    name: 'home',
-    component: () => import('@/views/HomeView.vue'),
-    meta: {
-      title: 'AI Puzzle Generator',
-      requiresAuth: false
-    }
+    redirect: '/login'
   },
   {
     path: '/login',
     name: 'login',
-    component: () => import('@/views/auth/LoginView.vue'),
+    component: () => import('@/views/LoginView.vue'),
     meta: {
       title: 'Login',
-      requiresAuth: false,
-      hideForAuth: true
+      requiresAuth: false
     }
   },
   {
-    path: '/signup',
-    name: 'signup',
-    component: () => import('@/views/auth/SignupView.vue'),
+    path: '/play',
+    name: 'play',
+    component: () => import('@/components/game/GameSelection.vue'),
     meta: {
-      title: 'Sign Up',
-      requiresAuth: false,
-      hideForAuth: true
+      title: 'Select Game',
+      requiresAuth: true
     }
   },
   {
-    path: '/game',
+    path: '/play/:puzzleId',
     name: 'game',
-    component: () => import('@/views/game/GameView.vue'),
+    component: () => import('@/components/game/PhaserGame.vue'),
     meta: {
       title: 'Play',
       requiresAuth: true
@@ -85,29 +78,20 @@ const router = createRouter({
 // Navigation guards
 router.beforeEach(async (to, from, next) => {
   // Update page title
-  document.title = to.meta.title ? `${to.meta.title} | Puzzler` : 'Puzzler'
+  document.title = to.meta.title ? `${to.meta.title} | AI Puzzler` : 'AI Puzzler'
 
   // Check authentication requirements
   const requiresAuth = to.meta.requiresAuth
-  const hideForAuth = to.meta.hideForAuth
 
-  // Import auth store lazily to avoid circular dependencies
-  const { useAuthStore } = await import('@/stores/auth')
-  const authStore = useAuthStore()
+  // Import user store
+  const { useUserStore } = await import('@/stores/user')
+  const userStore = useUserStore()
 
-  // Wait for auth to initialize
-  if (!authStore.initialized) {
-    await authStore.initialize()
-  }
-
-  const isAuthenticated = authStore.isAuthenticated
+  const isAuthenticated = userStore.isLoggedIn
 
   if (requiresAuth && !isAuthenticated) {
     // Redirect to login if auth is required
     next({ name: 'login', query: { redirect: to.fullPath } })
-  } else if (hideForAuth && isAuthenticated) {
-    // Redirect authenticated users away from auth pages
-    next({ name: 'home' })
   } else {
     next()
   }

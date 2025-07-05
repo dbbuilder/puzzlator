@@ -124,3 +124,20 @@ playwright-report/
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Debug files
+debug-*.png
+debug-*.js
+debug-*.cjs
+debug-*.mjs
+*.tmp
+*.temp
+
+# API server logs
+/tmp/api-server.log
+/tmp/vite.log
+
+# Test screenshots
+*.png
+!public/**/*.png
+!src/assets/**/*.png

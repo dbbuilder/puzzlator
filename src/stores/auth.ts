@@ -1,9 +1,14 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import { supabase } from '@/config/supabase'
-import type { User, Session } from '@supabase/supabase-js'
+// Supabase imports disabled - using custom auth instead
+// import { supabase } from '@/config/supabase'
+// import type { User, Session } from '@supabase/supabase-js'
 import type { Tables } from '@/types/database'
 import { useToast } from 'vue-toastification'
+
+// Temporary type definitions to prevent errors
+type User = any
+type Session = any
 
 export interface AuthState {
   user: User | null
@@ -33,6 +38,11 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Actions
   async function initialize() {
+    // Supabase auth disabled - using custom auth
+    initialized.value = true
+    loading.value = false
+    
+    /*
     try {
       loading.value = true
       
@@ -68,9 +78,14 @@ export const useAuthStore = defineStore('auth', () => {
       initialized.value = true
       loading.value = false
     }
+    */
   }
 
   async function fetchProfile() {
+    // Supabase disabled - using custom auth
+    return
+    
+    /*
     if (!user.value) return
 
     try {
@@ -94,9 +109,15 @@ export const useAuthStore = defineStore('auth', () => {
     } catch (error) {
       console.error('Failed to fetch profile:', error)
     }
+    */
   }
 
   async function signUp(email: string, password: string, username: string) {
+    // Supabase auth disabled - using custom auth
+    toast.error('Sign up is currently disabled. Please use custom auth.')
+    return { success: false, error: new Error('Supabase auth disabled') }
+    
+    /*
     try {
       loading.value = true
 
@@ -139,9 +160,15 @@ export const useAuthStore = defineStore('auth', () => {
     } finally {
       loading.value = false
     }
+    */
   }
 
   async function signIn(email: string, password: string) {
+    // Supabase auth disabled - using custom auth
+    toast.error('Sign in is currently disabled. Please use custom auth.')
+    return { success: false, error: new Error('Supabase auth disabled') }
+    
+    /*
     try {
       loading.value = true
 
@@ -161,9 +188,18 @@ export const useAuthStore = defineStore('auth', () => {
     } finally {
       loading.value = false
     }
+    */
   }
 
   async function signOut() {
+    // Supabase auth disabled - using custom auth
+    user.value = null
+    session.value = null
+    profile.value = null
+    toast.success('Signed out successfully')
+    return { success: true }
+    
+    /*
     try {
       loading.value = true
       const { error } = await supabase.auth.signOut()
@@ -184,9 +220,15 @@ export const useAuthStore = defineStore('auth', () => {
     } finally {
       loading.value = false
     }
+    */
   }
 
   async function updateProfile(updates: Partial<Tables<'user_profiles'>>) {
+    // Supabase disabled - using custom auth
+    toast.error('Profile update is currently disabled. Please use custom auth.')
+    return { success: false }
+    
+    /*
     if (!user.value) {
       toast.error('No user logged in')
       return { success: false }
@@ -217,9 +259,15 @@ export const useAuthStore = defineStore('auth', () => {
     } finally {
       loading.value = false
     }
+    */
   }
 
   async function resetPassword(email: string) {
+    // Supabase auth disabled - using custom auth
+    toast.error('Password reset is currently disabled. Please use custom auth.')
+    return { success: false }
+    
+    /*
     try {
       loading.value = true
 
@@ -238,6 +286,7 @@ export const useAuthStore = defineStore('auth', () => {
     } finally {
       loading.value = false
     }
+    */
   }
 
   return {

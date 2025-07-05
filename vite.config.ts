@@ -11,7 +11,8 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3000,
+    port: 14000,
+    host: true, // Listen on all interfaces
     open: true,
   },
   build: {
@@ -21,7 +22,7 @@ export default defineConfig({
       output: {
         manualChunks: {
           vendor: ['vue', 'vue-router', 'pinia'],
-          supabase: ['@supabase/supabase-js'],
+          // supabase: ['@supabase/supabase-js'], // Disabled - using custom auth
           phaser: ['phaser'],
           ai: ['openai'],
         },

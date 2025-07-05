@@ -9,8 +9,8 @@ import App from './App.vue'
 import './style.css'
 import 'vue-toastification/dist/index.css'
 
-// Initialize Supabase
-import { supabase } from './config/supabase'
+// Initialize Supabase (commented out - using custom auth)
+// import { supabase } from './config/supabase'
 
 // Create Vue app
 const app = createApp(App)
@@ -44,10 +44,10 @@ app.config.errorHandler = (err, instance, info) => {
   // TODO: Send to error tracking service
 }
 
-// Initialize authentication state
-supabase.auth.onAuthStateChange((event, session) => {
-  console.log('Auth state changed:', event, session?.user?.email)
-})
+// Initialize authentication state (using custom auth)
+// supabase.auth.onAuthStateChange((event, session) => {
+//   console.log('Auth state changed:', event, session?.user?.email)
+// })
 
 // Mount the app
 app.mount('#app')

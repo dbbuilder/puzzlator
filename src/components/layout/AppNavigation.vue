@@ -21,8 +21,8 @@
           </RouterLink>
           
           <RouterLink 
-            v-if="authStore.isAuthenticated"
-            to="/game" 
+            v-if="userStore.isAuthenticated"
+            to="/play" 
             class="nav-link"
             active-class="nav-link-active"
           >
@@ -40,18 +40,18 @@
 
         <!-- User menu -->
         <div class="flex items-center space-x-4">
-          <template v-if="authStore.isAuthenticated">
+          <template v-if="userStore.isAuthenticated">
             <RouterLink 
               to="/profile" 
               class="flex items-center space-x-2 hover:opacity-80 transition-opacity"
             >
               <img 
-                :src="authStore.profile?.avatar_url || '/assets/images/default-avatar.png'"
-                :alt="authStore.displayName"
+                :src="userStore.currentUser?.avatar_url || '/assets/images/default-avatar.png'"
+                :alt="userStore.currentUser?.username || 'User'"
                 class="w-8 h-8 rounded-full"
               >
               <span class="hidden md:block text-sm font-medium">
-                {{ authStore.displayName }}
+                {{ userStore.currentUser?.username || 'User' }}
               </span>
             </RouterLink>
             
@@ -65,14 +65,14 @@
           
           <template v-else>
             <button 
-              @click="appStore.openAuthModal('login')"
+              @click="router.push('/login')"
               class="btn-secondary text-sm"
             >
               Log In
             </button>
             
             <button 
-              @click="appStore.openAuthModal('signup')"
+              @click="router.push('/login')"
               class="btn-primary text-sm"
             >
               Sign Up
@@ -120,8 +120,8 @@
           </RouterLink>
           
           <RouterLink 
-            v-if="authStore.isAuthenticated"
-            to="/game" 
+            v-if="userStore.isAuthenticated"
+            to="/play" 
             class="mobile-nav-link"
             active-class="mobile-nav-link-active"
             @click="mobileMenuOpen = false"
@@ -139,7 +139,7 @@
           </RouterLink>
           
           <RouterLink 
-            v-if="authStore.isAuthenticated"
+            v-if="userStore.isAuthenticated"
             to="/profile" 
             class="mobile-nav-link"
             active-class="mobile-nav-link-active"
@@ -156,20 +156,18 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { useAuthStore } from '@/stores/auth'
-import { useAppStore } from '@/stores/app'
+import { useUserStore } from '@/stores/user'
+// import { useAppStore } from '@/stores/app'
 
 const router = useRouter()
-const authStore = useAuthStore()
-const appStore = useAppStore()
+const userStore = useUserStore()
+// const appStore = useAppStore()
 
 const mobileMenuOpen = ref(false)
 
 async function handleSignOut() {
-  const { success } = await authStore.signOut()
-  if (success) {
-    router.push('/')
-  }
+  await userStore.logout()
+  router.push('/login')
 }
 </script>
 

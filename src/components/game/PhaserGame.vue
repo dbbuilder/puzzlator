@@ -106,6 +106,7 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import Phaser from 'phaser'
 import {
   Clock,
@@ -120,6 +121,9 @@ import { Sudoku4x4Scene } from '@/game/engines/phaser/Sudoku4x4Scene'
 import { Sudoku4x4 } from '@/game/puzzles/sudoku/Sudoku4x4'
 import type { PuzzleMove } from '@/game/types/puzzle'
 import { useToast } from 'vue-toastification'
+import { useGameStore } from '@/stores/game'
+import { useUserStore } from '@/stores/user'
+import { api } from '@/services/api'
 
 const props = defineProps<{
   difficulty?: 'easy' | 'medium' | 'hard' | 'expert'
@@ -132,6 +136,10 @@ const emit = defineEmits<{
 }>()
 
 const toast = useToast()
+const route = useRoute()
+const router = useRouter()
+const gameStore = useGameStore()
+const userStore = useUserStore()
 
 // Refs
 const gameContainer = ref<HTMLDivElement>()
@@ -142,31 +150,64 @@ const puzzle = ref<Sudoku4x4 | null>(null)
 // Game state
 const isPaused = ref(false)
 const isCompleted = ref(false)
-const score = ref(0)
+const score = computed(() => gameStore.currentScore)
 const hintsRemaining = ref(3)
-const hintsUsed = ref(0)
-const elapsedTime = ref(0)
+const hintsUsed = computed(() => gameStore.hintsUsed)
+const elapsedTime = computed(() => gameStore.timeElapsed)
 const canUndo = ref(false)
 const canRedo = ref(false)
 
 // Timer
 let timerInterval: NodeJS.Timeout | null = null
+let saveInterval: NodeJS.Timeout | null = null
 
 // Computed
-const formattedTime = computed(() => {
-  const minutes = Math.floor(elapsedTime.value / 60)
-  const seconds = elapsedTime.value % 60
-  return `${minutes}:${seconds.toString().padStart(2, '0')}`
-})
+const formattedTime = computed(() => gameStore.formattedTime)
 
 // Methods
-const initGame = () => {
+const initGame = async () => {
   if (game.value) {
     game.value.destroy(true)
   }
 
+  // Load puzzle from route params or create new
+  const puzzleId = route.params.puzzleId as string
+  
+  if (puzzleId && !gameStore.currentPuzzle) {
+    // Load puzzle from database
+    const puzzleData = await api.getPuzzle(puzzleId)
+    if (puzzleData) {
+      gameStore.setCurrentPuzzle(puzzleData)
+      
+      // Check for existing session
+      const session = await api.getActiveGameSession(userStore.currentUserId!, puzzleId)
+      if (session) {
+        gameStore.setCurrentSession(session)
+      } else {
+        // Create new session
+        const newSession = await api.createGameSession({
+          user_id: userStore.currentUserId!,
+          puzzle_id: puzzleId,
+          game_state: puzzleData.puzzle_data
+        })
+        gameStore.setCurrentSession(newSession)
+      }
+    }
+  }
+
   // Create puzzle instance
   puzzle.value = new Sudoku4x4()
+  
+  // Load puzzle data if available
+  if (gameStore.currentPuzzle?.puzzle_data) {
+    const puzzleGrid = gameStore.currentPuzzle.puzzle_data as number[][]
+    puzzle.value.loadFromData({ grid: puzzleGrid })
+  }
+  
+  // Restore game state if resuming
+  if (gameStore.currentSession?.game_state) {
+    puzzle.value.loadFromData(gameStore.currentSession.game_state as any)
+  }
   
   // Create Phaser game
   const config: Phaser.Types.Core.GameConfig = {
@@ -193,6 +234,9 @@ const initGame = () => {
   
   // Start timer
   startTimer()
+  
+  // Start auto-save
+  startAutoSave()
 }
 
 const setupEventHandlers = () => {
@@ -207,6 +251,7 @@ const setupEventHandlers = () => {
     if (result.success) {
       scene.value!.updateFromPuzzleState()
       updateGameState()
+      gameStore.addMove(move)
       
       // Check if completed
       if (puzzle.value.isComplete()) {
@@ -235,19 +280,27 @@ const startTimer = () => {
   if (!puzzle.value) return
   
   puzzle.value.startTimer()
-  elapsedTime.value = 0
   
   timerInterval = setInterval(() => {
-    if (!isPaused.value && !isCompleted.value && puzzle.value) {
-      elapsedTime.value = puzzle.value.getElapsedTime()
+    if (!isPaused.value && !isCompleted.value) {
+      gameStore.incrementTime()
     }
   }, 1000)
+}
+
+const startAutoSave = () => {
+  saveInterval = setInterval(() => {
+    if (!isPaused.value && !isCompleted.value && puzzle.value) {
+      gameStore.saveProgress()
+    }
+  }, 10000) // Save every 10 seconds
 }
 
 const togglePause = () => {
   if (!puzzle.value || isCompleted.value) return
   
   isPaused.value = !isPaused.value
+  gameStore.togglePause()
   
   if (isPaused.value) {
     puzzle.value.pauseTimer()
@@ -297,7 +350,7 @@ const getHint = () => {
           scene.value.animateNumberPlacement(row, col, hint.possibleValues[0])
           
           hintsRemaining.value--
-          hintsUsed.value++
+          gameStore.useHint()
           puzzle.value.useHint()
           
           toast.success(`Hint: Place ${hint.possibleValues[0]} at row ${row + 1}, column ${col + 1}`)
@@ -310,19 +363,23 @@ const getHint = () => {
   toast.info('No obvious hints available. Keep trying!')
 }
 
-const handleCompletion = () => {
-  if (!puzzle.value) return
+const handleCompletion = async () => {
+  if (!puzzle.value || isCompleted.value) return
   
   isCompleted.value = true
   
-  // Calculate final score
-  score.value = puzzle.value.calculateScore({
-    timeElapsed: elapsedTime.value,
-    hintsUsed: hintsUsed.value,
-    difficulty: props.difficulty || 'easy'
-  })
+  // Complete the game in the store
+  await gameStore.completeGame()
   
-  emit('puzzle-complete', score.value)
+  emit('puzzle-complete', gameStore.currentScore)
+  
+  // Show completion message
+  toast.success(`Puzzle completed! Score: ${gameStore.currentScore}`)
+  
+  // Navigate to game selection after a delay
+  setTimeout(() => {
+    router.push('/play')
+  }, 3000)
 }
 
 // Keyboard shortcuts
@@ -350,11 +407,20 @@ onMounted(() => {
   window.addEventListener('keydown', handleKeydown)
 })
 
-onUnmounted(() => {
+onUnmounted(async () => {
   window.removeEventListener('keydown', handleKeydown)
   
   if (timerInterval) {
     clearInterval(timerInterval)
+  }
+  
+  if (saveInterval) {
+    clearInterval(saveInterval)
+  }
+  
+  // Save progress before leaving
+  if (!isCompleted.value && puzzle.value) {
+    await gameStore.saveProgress()
   }
   
   if (game.value) {

@@ -1,126 +1,70 @@
 version: '3.8'
 
-# Docker Compose configuration for Supabase local development
-# This is an alternative to using Supabase CLI if you prefer Docker Compose
-
 services:
   # PostgreSQL database
   postgres:
-    image: supabase/postgres:15.1.0.55
+    image: postgres:15
+    container_name: puzzler_postgres_db
+    hostname: puzzler-postgres
     ports:
       - "14322:5432"
     environment:
+      POSTGRES_USER: postgres
       POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_DB: puzzler
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - puzzler_postgres_data:/var/lib/postgresql/data
+      - ./supabase/migrations/standalone_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
       timeout: 5s
       retries: 5
+    networks:
+      - puzzler_internal_network
+    labels:
+      project: "puzzler"
+      service: "database"
 
-  # Supabase Studio (Database UI)
-  studio:
-    image: supabase/studio:latest
+  # pgAdmin for database management (optional)
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: puzzler_pgadmin
+    hostname: puzzler-pgadmin
     ports:
-      - "14323:3000"
+      - "14323:80"
     environment:
-      STUDIO_PG_META_URL: http://meta:8080
-      POSTGRES_PASSWORD: postgres
-      SUPABASE_URL: http://kong:8000
-      SUPABASE_ANON_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0
-      SUPABASE_SERVICE_KEY: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImV4cCI6MTk4MzgxMjk5Nn0.EGIM96RAZx35lJzdJsyH-qQwv8Hdp7fsn3W0YpN81IU
-    depends_on:
-      postgres:
-        condition: service_healthy
-
-  # Supabase Auth
-  auth:
-    image: supabase/gotrue:v2.99.0
-    ports:
-      - "9999:9999"
-    environment:
-      GOTRUE_API_HOST: 0.0.0.0
-      GOTRUE_API_PORT: 9999
-      API_EXTERNAL_URL: http://localhost:14321
-      GOTRUE_DB_DRIVER: postgres
-      GOTRUE_DB_DATABASE_URL: postgres://supabase_auth_admin:postgres@postgres:5432/postgres
-      GOTRUE_SITE_URL: http://localhost:3000
-      GOTRUE_URI_ALLOW_LIST: http://localhost:3000
-      GOTRUE_JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
-      GOTRUE_JWT_EXP: 3600
-      GOTRUE_JWT_DEFAULT_GROUP_NAME: authenticated
-      GOTRUE_DISABLE_SIGNUP: false
-      GOTRUE_EXTERNAL_EMAIL_ENABLED: true
-      GOTRUE_MAILER_AUTOCONFIRM: true
-    depends_on:
-      postgres:
-        condition: service_healthy
-
-  # Supabase REST API
-  rest:
-    image: postgrest/postgrest:v11.2.0
-    ports:
-      - "14321:3000"
-    environment:
-      PGRST_DB_URI: postgres://authenticator:postgres@postgres:5432/postgres
-      PGRST_DB_SCHEMAS: public,storage,graphql_public
-      PGRST_DB_ANON_ROLE: anon
-      PGRST_JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
-      PGRST_DB_USE_LEGACY_GUCS: false
-    depends_on:
-      postgres:
-        condition: service_healthy
-
-  # Supabase Realtime
-  realtime:
-    image: supabase/realtime:v2.25.35
-    ports:
-      - "14324:4000"
-    environment:
-      PORT: 4000
-      DB_HOST: postgres
-      DB_PORT: 5432
-      DB_NAME: postgres
-      DB_USER: supabase_admin
-      DB_PASSWORD: postgres
-      DB_SSL: false
-      JWT_SECRET: super-secret-jwt-token-with-at-least-32-characters-long
-      SECURE_CHANNELS: true
-    depends_on:
-      postgres:
-        condition: service_healthy
-
-  # Kong API Gateway
-  kong:
-    image: kong:2.8.1
-    ports:
-      - "8000:8000"
-      - "8443:8443"
-    environment:
-      KONG_DATABASE: "off"
-      KONG_DECLARATIVE_CONFIG: /var/lib/kong/kong.yml
-      KONG_DNS_ORDER: LAST,A,CNAME
-      KONG_PLUGINS: request-transformer,cors,key-auth,acl,basic-auth,jwt
+      PGADMIN_DEFAULT_EMAIL: admin@puzzler.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+      PGADMIN_CONFIG_SERVER_MODE: 'False'
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: 'False'
     volumes:
-      - ./supabase/kong.yml:/var/lib/kong/kong.yml:ro
-
-  # PostgREST Meta
-  meta:
-    image: supabase/postgres-meta:v0.68.0
-    ports:
-      - "8080:8080"
-    environment:
-      PG_META_PORT: 8080
-      PG_META_DB_HOST: postgres
-      PG_META_DB_PORT: 5432
-      PG_META_DB_NAME: postgres
-      PG_META_DB_USER: supabase_admin
-      PG_META_DB_PASSWORD: postgres
+      - puzzler_pgadmin_data:/var/lib/pgadmin
     depends_on:
       postgres:
         condition: service_healthy
+    networks:
+      - puzzler_internal_network
+    labels:
+      project: "puzzler"
+      service: "pgadmin"
+
+networks:
+  puzzler_internal_network:
+    name: puzzler_network
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16
+          gateway: 172.28.0.1
 
 volumes:
-  postgres_data:
+  puzzler_postgres_data:
+    name: puzzler_postgres_data
+    labels:
+      project: "puzzler"
+  puzzler_pgadmin_data:
+    name: puzzler_pgadmin_data
+    labels:
+      project: "puzzler"
