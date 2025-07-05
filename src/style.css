@@ -38,7 +38,7 @@
   }
   
   .input {
-    @apply w-full px-3 py-2 bg-game-surface border border-game-border rounded-lg text-game-text placeholder-slate-400 focus:border-game-accent focus:ring-1 focus:ring-game-accent;
+    @apply w-full px-3 py-2 bg-white border border-gray-300 rounded-lg text-gray-900 placeholder-gray-500 focus:border-purple-500 focus:ring-1 focus:ring-purple-500;
   }
   
   .puzzle-grid {
