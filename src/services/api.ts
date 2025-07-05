@@ -7,8 +7,37 @@ type Achievement = Database['public']['Tables']['achievements']['Row']
 
 export class ApiService {
   private baseUrl = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : 'http://localhost:14001/api'
+  private useLocalStorage = import.meta.env.PROD && !import.meta.env.VITE_API_URL
 
   async request<T>(url: string, options?: RequestInit): Promise<T> {
+    // Handle production without API using localStorage
+    if (this.useLocalStorage && url === '/login' && options?.method === 'POST') {
+      const body = JSON.parse(options.body as string)
+      const username = body.username
+      
+      // Create a simple user profile
+      const userId = `user_${username}_${Date.now()}`
+      const profile = {
+        id: userId,
+        username: username,
+        display_name: username,
+        avatar_url: null,
+        bio: null,
+        total_score: 0,
+        puzzles_completed: 0,
+        puzzles_attempted: 0,
+        total_play_time: 0,
+        preferred_difficulty: 'medium',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      }
+      
+      // Store in localStorage
+      localStorage.setItem('puzzlator_user', JSON.stringify(profile))
+      
+      return profile as T
+    }
+
     const response = await fetch(`${this.baseUrl}${url}`, {
       ...options,
       headers: {

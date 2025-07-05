@@ -1,6 +1,9 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { api } from '@/services/api'
+
+// Check if we're in production without a proper API
+const isProductionWithoutAPI = import.meta.env.PROD && !import.meta.env.VITE_API_URL
 import type { Database } from '@/types/db'
 
 type UserProfile = Database['public']['Tables']['user_profiles']['Row']
