@@ -1,13 +1,13 @@
 <template>
-  <nav class="bg-game-surface border-b border-game-border">
+  <nav class="bg-white border-b border-gray-200 shadow-sm">
     <div class="container mx-auto px-4">
       <div class="flex items-center justify-between h-16">
         <!-- Logo and brand -->
         <RouterLink to="/" class="flex items-center space-x-2">
-          <div class="w-8 h-8 bg-game-accent rounded-lg flex items-center justify-center">
+          <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
             <span class="text-white font-bold text-lg">P</span>
           </div>
-          <span class="text-xl font-semibold text-game-text">Puzzler</span>
+          <span class="text-xl font-semibold text-gray-800">Puzzler</span>
         </RouterLink>
 
         <!-- Desktop navigation -->
@@ -57,7 +57,7 @@
             
             <button 
               @click="handleSignOut"
-              class="text-sm text-game-muted hover:text-game-text transition-colors"
+              class="text-sm text-gray-600 hover:text-gray-900 transition-colors"
             >
               Sign Out
             </button>
@@ -83,7 +83,7 @@
         <!-- Mobile menu toggle -->
         <button 
           @click="mobileMenuOpen = !mobileMenuOpen"
-          class="md:hidden p-2 rounded-lg hover:bg-game-muted/10 transition-colors"
+          class="md:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors text-gray-700"
         >
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path 
@@ -173,26 +173,26 @@ async function handleSignOut() {
 
 <style scoped>
 .nav-link {
-  @apply text-game-muted hover:text-game-text transition-colors font-medium;
+  @apply text-gray-600 hover:text-gray-900 transition-colors font-medium;
 }
 
 .nav-link-active {
-  @apply text-game-accent;
+  @apply text-purple-600;
 }
 
 .mobile-nav-link {
-  @apply px-4 py-2 rounded-lg text-game-muted hover:bg-game-muted/10 hover:text-game-text transition-all font-medium;
+  @apply px-4 py-2 rounded-lg text-gray-600 hover:bg-gray-100 hover:text-gray-900 transition-all font-medium;
 }
 
 .mobile-nav-link-active {
-  @apply bg-game-accent/10 text-game-accent;
+  @apply bg-purple-100 text-purple-600;
 }
 
 .btn-primary {
-  @apply px-4 py-2 bg-game-accent text-white rounded-lg hover:bg-game-accent-hover transition-colors font-medium;
+  @apply px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors font-medium;
 }
 
 .btn-secondary {
-  @apply px-4 py-2 text-game-text hover:bg-game-muted/10 rounded-lg transition-colors font-medium;
+  @apply px-4 py-2 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors font-medium;
 }
 </style>

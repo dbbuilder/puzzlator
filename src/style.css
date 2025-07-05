@@ -8,7 +8,7 @@
   }
   
   body {
-    @apply bg-game-background text-game-text antialiased;
+    @apply bg-gray-50 text-gray-900 antialiased;
   }
   
   * {

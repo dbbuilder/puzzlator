@@ -1,13 +1,13 @@
 <template>
-  <div id="app" class="min-h-screen bg-game-background text-game-text">
+  <div id="app" class="min-h-screen">
     <!-- Loading screen -->
     <div 
       v-if="isLoading" 
-      class="fixed inset-0 bg-game-background flex items-center justify-center z-50"
+      class="fixed inset-0 bg-gray-100 flex items-center justify-center z-50"
     >
       <div class="text-center">
-        <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-game-accent mb-4"></div>
-        <p class="text-game-accent">Loading AI Puzzle Generator...</p>
+        <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mb-4"></div>
+        <p class="text-gray-700">Loading AI Puzzle Generator...</p>
       </div>
     </div>
 
