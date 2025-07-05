@@ -34,7 +34,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-import { useUserStore } from '@/stores/user'
+import { useAuthStore } from '@/stores/auth'
 // import { useAppStore } from '@/stores/app'
 
 // Import components
@@ -44,7 +44,7 @@ import AppNavigation from '@/components/layout/AppNavigation.vue'
 // import AuthModal from '@/components/modals/AuthModal.vue'
 
 // Stores
-const userStore = useUserStore()
+const authStore = useAuthStore()
 // const appStore = useAppStore()
 const route = useRoute()
 
@@ -61,8 +61,8 @@ const showNavigation = computed(() => {
 // Lifecycle
 onMounted(async () => {
   try {
-    // Initialize user store
-    // await userStore.loadProfile()
+    // Initialize auth store
+    await authStore.initialize()
     
     // Initialize app settings
     // await appStore.initialize()

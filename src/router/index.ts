@@ -10,7 +10,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'login',
-    component: () => import('@/views/LoginView.vue'),
+    component: () => import('@/views/LoginSupabaseView.vue'),
     meta: {
       title: 'Login',
       requiresAuth: false
@@ -83,11 +83,11 @@ router.beforeEach(async (to, from, next) => {
   // Check authentication requirements
   const requiresAuth = to.meta.requiresAuth
 
-  // Import user store
-  const { useUserStore } = await import('@/stores/user')
-  const userStore = useUserStore()
+  // Import auth store
+  const { useAuthStore } = await import('@/stores/auth')
+  const authStore = useAuthStore()
 
-  const isAuthenticated = userStore.isLoggedIn
+  const isAuthenticated = authStore.isAuthenticated
 
   if (requiresAuth && !isAuthenticated) {
     // Redirect to login if auth is required

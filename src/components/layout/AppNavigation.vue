@@ -21,7 +21,7 @@
           </RouterLink>
           
           <RouterLink 
-            v-if="userStore.isAuthenticated"
+            v-if="authStore.isAuthenticated"
             to="/play" 
             class="nav-link"
             active-class="nav-link-active"
@@ -40,18 +40,18 @@
 
         <!-- User menu -->
         <div class="flex items-center space-x-4">
-          <template v-if="userStore.isAuthenticated">
+          <template v-if="authStore.isAuthenticated">
             <RouterLink 
               to="/profile" 
               class="flex items-center space-x-2 hover:opacity-80 transition-opacity"
             >
               <img 
-                :src="userStore.currentUser?.avatar_url || '/assets/images/default-avatar.png'"
-                :alt="userStore.currentUser?.username || 'User'"
+                :src="authStore.profile?.avatar_url || '/assets/images/default-avatar.png'"
+                :alt="authStore.profile?.username || 'User'"
                 class="w-8 h-8 rounded-full"
               >
               <span class="hidden md:block text-sm font-medium">
-                {{ userStore.currentUser?.username || 'User' }}
+                {{ authStore.profile?.username || 'User' }}
               </span>
             </RouterLink>
             
@@ -120,7 +120,7 @@
           </RouterLink>
           
           <RouterLink 
-            v-if="userStore.isAuthenticated"
+            v-if="authStore.isAuthenticated"
             to="/play" 
             class="mobile-nav-link"
             active-class="mobile-nav-link-active"
@@ -139,7 +139,7 @@
           </RouterLink>
           
           <RouterLink 
-            v-if="userStore.isAuthenticated"
+            v-if="authStore.isAuthenticated"
             to="/profile" 
             class="mobile-nav-link"
             active-class="mobile-nav-link-active"
@@ -156,17 +156,19 @@
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 import { useUserStore } from '@/stores/user'
 // import { useAppStore } from '@/stores/app'
 
 const router = useRouter()
+const authStore = useAuthStore()
 const userStore = useUserStore()
 // const appStore = useAppStore()
 
 const mobileMenuOpen = ref(false)
 
 async function handleSignOut() {
-  await userStore.logout()
+  await authStore.signOut()
   router.push('/login')
 }
 </script>
