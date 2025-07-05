@@ -7,7 +7,7 @@
           <div class="w-8 h-8 bg-purple-600 rounded-lg flex items-center justify-center">
             <span class="text-white font-bold text-lg">P</span>
           </div>
-          <span class="text-xl font-semibold text-gray-800">Puzzler</span>
+          <span class="text-xl font-semibold text-gray-800">Puzzlator</span>
         </RouterLink>
 
         <!-- Desktop navigation -->

@@ -1,4 +1,4 @@
-# AI Puzzle Game Generator
+# Puzzlator - AI Puzzle Game Generator
 
 🧩 **An intelligent, dynamic puzzle game that creates personalized challenges using AI**
 
@@ -253,7 +253,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Documentation**: Comprehensive guides in the [docs/](docs/) directory
 - **Issues**: Report bugs and request features via GitHub Issues
 - **Discussions**: Join community conversations in GitHub Discussions
-- **Email**: Contact the development team at support@puzzleai.game
+- **Email**: Contact the development team at support@puzzlator.com
 
 ---
 

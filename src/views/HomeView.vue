@@ -41,7 +41,7 @@
     <section ref="featuresSection" class="py-16 px-4 bg-game-surface">
       <div class="container mx-auto">
         <h2 class="text-3xl md:text-4xl font-bold text-center text-game-text mb-12">
-          Why Puzzler?
+          Why Puzzlator?
         </h2>
         
         <div class="grid md:grid-cols-3 gap-8">

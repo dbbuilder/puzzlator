@@ -7,7 +7,7 @@
     >
       <div class="text-center">
         <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-purple-600 mb-4"></div>
-        <p class="text-gray-700">Loading AI Puzzle Generator...</p>
+        <p class="text-gray-700">Loading Puzzlator...</p>
       </div>
     </div>
 

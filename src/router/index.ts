@@ -78,7 +78,7 @@ const router = createRouter({
 // Navigation guards
 router.beforeEach(async (to, from, next) => {
   // Update page title
-  document.title = to.meta.title ? `${to.meta.title} | AI Puzzler` : 'AI Puzzler'
+  document.title = to.meta.title ? `${to.meta.title} | Puzzlator` : 'Puzzlator'
 
   // Check authentication requirements
   const requiresAuth = to.meta.requiresAuth

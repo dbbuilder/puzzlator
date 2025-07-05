@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-AI Puzzle Game Generator - A Vue.js web application that uses OpenAI GPT to dynamically generate personalized puzzle challenges with adaptive difficulty.
+Puzzlator - A Vue.js web application that uses OpenAI GPT to dynamically generate personalized puzzle challenges with adaptive difficulty.
 
 ## Essential Commands
 

@@ -1,6 +1,6 @@
-# Contributing to AI Puzzle Generator
+# Contributing to Puzzlator
 
-Thank you for your interest in contributing to the AI Puzzle Generator! This document provides guidelines for contributing to the project.
+Thank you for your interest in contributing to Puzzlator! This document provides guidelines for contributing to the project.
 
 ## 🎯 Project Goals
 
