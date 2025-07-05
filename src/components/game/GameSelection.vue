@@ -295,10 +295,10 @@ function generateSamplePuzzle(type: string, difficulty: string) {
   // Generate sample puzzle data based on type
   if (type === 'sudoku4x4') {
     const puzzle = [
-      [1, 0, 3, 0],
-      [0, 4, 0, 2],
-      [2, 0, 4, 0],
-      [0, 3, 0, 1]
+      [1, null, 3, null],
+      [null, 4, null, 2],
+      [2, null, 4, null],
+      [null, 3, null, 1]
     ]
     const solution = [
       [1, 2, 3, 4],

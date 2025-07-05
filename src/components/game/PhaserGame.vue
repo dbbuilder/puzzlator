@@ -200,13 +200,18 @@ const initGame = async () => {
   
   // Load puzzle data if available
   if (gameStore.currentPuzzle?.puzzle_data) {
-    const puzzleGrid = gameStore.currentPuzzle.puzzle_data as number[][]
-    puzzle.value.loadFromData({ grid: puzzleGrid })
+    const puzzleGrid = gameStore.currentPuzzle.puzzle_data as (number | null)[][]
+    puzzle.value.loadPuzzle(puzzleGrid)
   }
   
   // Restore game state if resuming
   if (gameStore.currentSession?.game_state) {
-    puzzle.value.loadFromData(gameStore.currentSession.game_state as any)
+    const gameState = gameStore.currentSession.game_state as any
+    if (typeof gameState === 'string') {
+      puzzle.value.deserialize(gameState)
+    } else if (gameState.grid) {
+      puzzle.value.loadPuzzle(gameState.grid)
+    }
   }
   
   // Create Phaser game
