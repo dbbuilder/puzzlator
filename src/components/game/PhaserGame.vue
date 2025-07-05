@@ -1,6 +1,6 @@
 <template>
   <div class="phaser-game-container">
-    <div ref="gameContainer" class="game-canvas"></div>
+    <div ref="gameContainer" id="phaser-game" class="game-canvas"></div>
     
     <!-- Game UI Overlay -->
     <div class="game-ui">
@@ -442,11 +442,11 @@ watch(() => props.difficulty, () => {
 
 <style scoped>
 .phaser-game-container {
-  @apply relative w-full h-full bg-gray-900;
+  @apply relative w-full h-screen bg-gray-900;
 }
 
 .game-canvas {
-  @apply w-full h-full;
+  @apply w-full h-full min-h-[600px];
 }
 
 .game-ui {
