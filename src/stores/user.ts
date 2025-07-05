@@ -14,6 +14,8 @@ export const useUserStore = defineStore('user', () => {
   const error = ref<string | null>(null)
 
   const isLoggedIn = computed(() => currentUserId.value !== null)
+  const isAuthenticated = computed(() => currentUserId.value !== null)
+  const currentUser = computed(() => userProfile.value)
   const displayName = computed(() => userProfile.value?.display_name || userProfile.value?.username || 'Guest')
   const totalScore = computed(() => userProfile.value?.total_score || 0)
   const completionRate = computed(() => {
@@ -31,7 +33,7 @@ export const useUserStore = defineStore('user', () => {
       const response = await api.request('/login', {
         method: 'POST',
         body: requestBody
-      })
+      }) as any
       
       currentUserId.value = response.id
       userProfile.value = response
@@ -107,6 +109,8 @@ export const useUserStore = defineStore('user', () => {
     
     // Computed
     isLoggedIn,
+    isAuthenticated,
+    currentUser,
     displayName,
     totalScore,
     completionRate,

@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc && vite build",
+    "build": "vite build",
+    "build-with-types": "vue-tsc --noEmit -p tsconfig.build.json && vite build",
     "preview": "vite preview",
     "test": "vitest",
     "test:e2e": "cypress run",

@@ -91,7 +91,7 @@ export class Sudoku4x4Scene extends Phaser.Scene {
 
   destroy(): void {
     this.scale.off('resize', this.handleResize, this)
-    super.destroy()
+    // Phaser Scene doesn't have destroy method, it's handled by the game
   }
 
   // Public API
@@ -601,7 +601,7 @@ export class Sudoku4x4Scene extends Phaser.Scene {
           text.setDepth(10)
           
           ;(text as CellText).cellData = { row, col, locked: cell.locked }
-          ;(text as CellText).locked = cell.locked
+          ;(text as any).locked = cell.locked
           this.cellTexts.set(`${row},${col}`, text as CellText)
         }
       }

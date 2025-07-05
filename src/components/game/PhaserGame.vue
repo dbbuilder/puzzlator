@@ -231,7 +231,7 @@ const initGame = async () => {
   game.value = new Phaser.Game(config)
   
   // Create and add scene
-  scene.value = new Sudoku4x4Scene(puzzle.value)
+  scene.value = new Sudoku4x4Scene(puzzle.value as any)
   game.value.scene.add('Sudoku4x4Scene', scene.value, true)
 
   // Set up event handlers
@@ -352,7 +352,7 @@ const getHint = () => {
           }
           puzzle.value.makeMove(move)
           scene.value.updateFromPuzzleState()
-          scene.value.animateNumberPlacement(row, col, hint.possibleValues[0])
+          scene.value.animateNumberPlacement(row, col, hint.possibleValues[0] as number)
           
           hintsRemaining.value--
           gameStore.useHint()

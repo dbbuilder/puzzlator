@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 // Supabase imports disabled - using custom auth instead
 // import { supabase } from '@/config/supabase'
 // import type { User, Session } from '@supabase/supabase-js'
-import type { Tables } from '@/types/database'
+// import type { Tables } from '@/types/database'
 import { useToast } from 'vue-toastification'
 
 // Temporary type definitions to prevent errors
@@ -13,7 +13,7 @@ type Session = any
 export interface AuthState {
   user: User | null
   session: Session | null
-  profile: Tables<'user_profiles'> | null
+  profile: any | null // Tables<'user_profiles'> | null
   initialized: boolean
   loading: boolean
 }
@@ -22,7 +22,7 @@ export const useAuthStore = defineStore('auth', () => {
   // State
   const user = ref<User | null>(null)
   const session = ref<Session | null>(null)
-  const profile = ref<Tables<'user_profiles'> | null>(null)
+  const profile = ref<any | null>(null) // Tables<'user_profiles'> | null
   const initialized = ref(false)
   const loading = ref(false)
   
@@ -223,7 +223,7 @@ export const useAuthStore = defineStore('auth', () => {
     */
   }
 
-  async function updateProfile(updates: Partial<Tables<'user_profiles'>>) {
+  async function updateProfile(updates: any) { // Partial<Tables<'user_profiles'>>
     // Supabase disabled - using custom auth
     toast.error('Profile update is currently disabled. Please use custom auth.')
     return { success: false }

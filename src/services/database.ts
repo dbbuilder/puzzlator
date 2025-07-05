@@ -1,4 +1,4 @@
-import { Database } from '@/types/db'
+import type { Database } from '@/types/db'
 
 export class DatabaseService {
   private baseUrl = 'http://localhost:14322'

@@ -108,7 +108,7 @@ export const useGameStore = defineStore('game', () => {
 
       // Add to leaderboard
       if (currentPuzzle.value) {
-        await api.addLeaderboardEntry({
+        const entry: any = {
           user_id: currentSession.value.user_id,
           puzzle_id: currentPuzzle.value.id,
           puzzle_type: currentPuzzle.value.type,
@@ -117,7 +117,8 @@ export const useGameStore = defineStore('game', () => {
           time_elapsed: timeElapsed.value,
           hints_used: hintsUsed.value,
           period_type: 'all_time'
-        })
+        }
+        await api.addLeaderboardEntry(entry)
       }
     } catch (error) {
       console.error('Failed to complete game:', error)

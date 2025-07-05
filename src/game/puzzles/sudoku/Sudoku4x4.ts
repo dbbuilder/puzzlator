@@ -465,7 +465,7 @@ export class Sudoku4x4 implements Puzzle {
       for (let i = this.moveHistory.length - 1; i >= 0; i--) {
         const move = this.moveHistory[i]
         if (move.row === lastMove.row && move.col === lastMove.col) {
-          previousValue = move.value
+          previousValue = typeof move.value === 'string' ? parseInt(move.value) : move.value
           break
         }
       }
