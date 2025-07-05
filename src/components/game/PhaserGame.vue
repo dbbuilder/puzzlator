@@ -73,7 +73,7 @@
     <Transition name="modal">
       <div v-if="isCompleted" class="completion-modal">
         <div class="modal-content">
-          <h2 class="text-3xl font-bold text-green-500 mb-4">
+          <h2 class="text-3xl font-bold text-green-600 mb-4">
             🎉 Puzzle Complete!
           </h2>
           <div class="stats-summary">
@@ -487,7 +487,7 @@ watch(() => props.difficulty, () => {
 }
 
 .pause-content {
-  @apply bg-gray-800 p-8 rounded-lg text-center;
+  @apply bg-white p-8 rounded-lg text-center text-gray-900;
 }
 
 .completion-modal {
@@ -495,15 +495,15 @@ watch(() => props.difficulty, () => {
 }
 
 .modal-content {
-  @apply bg-gray-800 p-8 rounded-lg text-center max-w-md w-full mx-4;
+  @apply bg-white p-8 rounded-lg text-center max-w-md w-full mx-4 text-gray-900;
 }
 
 .stats-summary {
-  @apply space-y-2 mb-6;
+  @apply space-y-2 mb-6 text-gray-700;
 }
 
 .stat-line {
-  @apply text-lg flex items-center justify-center;
+  @apply text-lg flex items-center justify-center text-gray-700;
 }
 
 .modal-actions {
@@ -515,11 +515,11 @@ watch(() => props.difficulty, () => {
 }
 
 .btn-primary {
-  @apply bg-blue-600 text-white hover:bg-blue-700;
+  @apply bg-purple-600 text-white hover:bg-purple-700;
 }
 
 .btn-secondary {
-  @apply bg-gray-600 text-white hover:bg-gray-700;
+  @apply bg-gray-200 text-gray-900 hover:bg-gray-300;
 }
 
 /* Transitions */
