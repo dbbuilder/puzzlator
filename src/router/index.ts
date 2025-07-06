@@ -8,6 +8,10 @@ const routes: RouteRecordRaw[] = [
     redirect: '/login'
   },
   {
+    path: '/index.html',
+    redirect: '/login'
+  },
+  {
     path: '/login',
     name: 'login',
     component: () => import('@/views/LoginSupabaseView.vue'),
