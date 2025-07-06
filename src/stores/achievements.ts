@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { achievementService } from '@/services/achievements'
-import { useSupabaseStore } from './supabase-store'
+import { supabase } from '@/config/supabase'
 import { useUserStore } from './user-supabase'
 import type { Achievement, AchievementNotificationData } from '@/types/achievements'
 
@@ -36,7 +36,7 @@ export const useAchievementsStore = defineStore('achievements', () => {
     error.value = null
     
     try {
-      const supabase = useSupabaseStore().client
+      // Use the imported supabase client directly
       if (!supabase) {
         throw new Error('Supabase client not initialized')
       }
@@ -70,7 +70,7 @@ export const useAchievementsStore = defineStore('achievements', () => {
 
   async function loadUserAchievements(userId: string) {
     try {
-      const supabase = useSupabaseStore().client
+      // Use the imported supabase client directly
       if (!supabase) return
 
       const { data: userAchievementsData, error: userAchievementsError } = await supabase
@@ -122,7 +122,7 @@ export const useAchievementsStore = defineStore('achievements', () => {
     }
 
     try {
-      const supabase = useSupabaseStore().client
+      // Use the imported supabase client directly
       if (!supabase) return
 
       // Check if already unlocked
@@ -182,7 +182,7 @@ export const useAchievementsStore = defineStore('achievements', () => {
     // Save progress to database if authenticated
     if (userStore.isAuthenticated && userStore.currentUser) {
       try {
-        const supabase = useSupabaseStore().client
+        // Use the imported supabase client directly
         if (!supabase) return
 
         const { error: updateError } = await supabase
