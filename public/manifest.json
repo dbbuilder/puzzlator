@@ -1,0 +1,109 @@
+{
+  "name": "Puzzlator - AI Puzzle Game",
+  "short_name": "Puzzlator",
+  "description": "Challenge your mind with AI-generated puzzles. Play Sudoku, pattern matching, spatial puzzles and more!",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#7c3aed",
+  "orientation": "any",
+  "categories": ["games", "puzzle", "education"],
+  "icons": [
+    {
+      "src": "/assets/images/icon-72.png",
+      "sizes": "72x72",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/images/icon-96.png",
+      "sizes": "96x96",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/images/icon-128.png",
+      "sizes": "128x128",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/images/icon-144.png",
+      "sizes": "144x144",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/images/icon-152.png",
+      "sizes": "152x152",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/images/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/assets/images/icon-384.png",
+      "sizes": "384x384",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/images/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "/assets/images/screenshot-1.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "Game selection screen"
+    },
+    {
+      "src": "/assets/images/screenshot-2.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "Sudoku gameplay"
+    },
+    {
+      "src": "/assets/images/screenshot-3.png",
+      "sizes": "1280x720",
+      "type": "image/png",
+      "label": "Pattern matching puzzle"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "New Sudoku",
+      "short_name": "Sudoku",
+      "description": "Start a new Sudoku puzzle",
+      "url": "/play?type=sudoku4x4",
+      "icons": [
+        {
+          "src": "/assets/images/sudoku-icon.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Daily Challenge",
+      "short_name": "Daily",
+      "description": "Play today's daily challenge",
+      "url": "/daily",
+      "icons": [
+        {
+          "src": "/assets/images/daily-icon.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "prefer_related_applications": false,
+  "related_applications": []
+}
