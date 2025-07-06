@@ -67,6 +67,15 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/settings',
+    name: 'settings',
+    component: () => import(/* webpackChunkName: "settings" */ '@/views/SettingsView.vue'),
+    meta: {
+      title: 'Settings',
+      requiresAuth: true
+    }
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     component: () => import(/* webpackChunkName: "not-found" */ '@/views/NotFoundView.vue'),

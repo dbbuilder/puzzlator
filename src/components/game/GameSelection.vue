@@ -108,6 +108,9 @@
           <router-link to="/profile" class="px-4 py-2 text-purple-600 hover:text-purple-700 font-medium">
             Profile
           </router-link>
+          <router-link to="/settings" class="px-4 py-2 text-purple-600 hover:text-purple-700 font-medium">
+            Settings
+          </router-link>
         </div>
       </div>
 
