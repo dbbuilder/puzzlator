@@ -57,6 +57,15 @@ const routes: RouteRecordRaw[] = [
     }
   },
   {
+    path: '/achievements',
+    name: 'achievements',
+    component: () => import('@/views/AchievementsView.vue'),
+    meta: {
+      title: 'Achievements',
+      requiresAuth: false
+    }
+  },
+  {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
     component: () => import('@/views/NotFoundView.vue'),

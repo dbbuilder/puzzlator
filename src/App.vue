@@ -28,28 +28,40 @@
     <!-- Global modals and overlays -->
     <!-- <ErrorModal /> -->
     <!-- <AuthModal /> -->
+    
+    <!-- Achievement Notifications -->
+    <AchievementNotification
+      :achievement="currentAchievement"
+      @hidden="handleAchievementHidden"
+      @dismiss="handleAchievementDismiss"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import { useAchievementsStore } from '@/stores/achievements'
 // import { useAppStore } from '@/stores/app'
+import type { Achievement } from '@/types/achievements'
 
 // Import components
 import AppNavigation from '@/components/layout/AppNavigation.vue'
+import AchievementNotification from '@/components/achievements/AchievementNotification.vue'
 // import AppFooter from '@/components/layout/AppFooter.vue'
 // import ErrorModal from '@/components/modals/ErrorModal.vue'
 // import AuthModal from '@/components/modals/AuthModal.vue'
 
 // Stores
 const authStore = useAuthStore()
+const achievementsStore = useAchievementsStore()
 // const appStore = useAppStore()
 const route = useRoute()
 
 // Reactive state
 const isLoading = ref(true)
+const currentAchievement = ref<Achievement | null>(null)
 
 // Computed properties
 const showNavigation = computed(() => {
@@ -107,6 +119,42 @@ async function preloadResources() {
   const { preloadSounds } = await import('@/utils/sounds')
   preloadSounds()
 }
+
+// Achievement notification handlers
+function handleAchievementHidden() {
+  currentAchievement.value = null
+  checkForNextAchievement()
+}
+
+function handleAchievementDismiss() {
+  currentAchievement.value = null
+  checkForNextAchievement()
+}
+
+function checkForNextAchievement() {
+  const notification = achievementsStore.getNextNotification()
+  if (notification) {
+    currentAchievement.value = notification.achievement
+  }
+}
+
+// Watch for new achievements
+let achievementCheckInterval: NodeJS.Timeout | null = null
+onMounted(() => {
+  // Check for achievements periodically
+  achievementCheckInterval = setInterval(() => {
+    if (!currentAchievement.value) {
+      checkForNextAchievement()
+    }
+  }, 1000)
+})
+
+// Cleanup
+onUnmounted(() => {
+  if (achievementCheckInterval) {
+    clearInterval(achievementCheckInterval)
+  }
+})
 </script>
 
 <style scoped>

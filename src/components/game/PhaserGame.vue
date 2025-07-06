@@ -123,6 +123,7 @@ import type { PuzzleMove } from '@/game/types/puzzle'
 import { useToast } from 'vue-toastification'
 import { useGameStore } from '@/stores/game'
 import { useUserStore } from '@/stores/user'
+import { useAchievementsStore } from '@/stores/achievements'
 import { supabase } from '@/config/supabase'
 
 const props = defineProps<{
@@ -394,6 +395,20 @@ const handleCompletion = async () => {
   
   // Complete the game in the store
   await gameStore.completeGame()
+  
+  // Check for achievements
+  const achievementsStore = useAchievementsStore()
+  const gameData = {
+    puzzleType: puzzle.value.type,
+    difficulty: puzzle.value.difficulty,
+    score: gameStore.currentScore,
+    time: gameStore.timeElapsed,
+    moves: gameStore.totalMoves,
+    hints: gameStore.hintsUsed,
+    mistakes: puzzle.value.getMistakes ? puzzle.value.getMistakes() : 0,
+    completed: true
+  }
+  achievementsStore.checkAndUnlockAchievements(gameData)
   
   emit('puzzle-complete', gameStore.currentScore)
   

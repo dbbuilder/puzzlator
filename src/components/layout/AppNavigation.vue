@@ -36,6 +36,15 @@
           >
             Leaderboard
           </RouterLink>
+          
+          <RouterLink 
+            v-if="authStore.isAuthenticated"
+            to="/achievements" 
+            class="nav-link"
+            active-class="nav-link-active"
+          >
+            Achievements
+          </RouterLink>
         </div>
 
         <!-- User menu -->
@@ -136,6 +145,16 @@
             @click="mobileMenuOpen = false"
           >
             Leaderboard
+          </RouterLink>
+          
+          <RouterLink 
+            v-if="authStore.isAuthenticated"
+            to="/achievements" 
+            class="mobile-nav-link"
+            active-class="mobile-nav-link-active"
+            @click="mobileMenuOpen = false"
+          >
+            Achievements
           </RouterLink>
           
           <RouterLink 
