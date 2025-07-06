@@ -38,6 +38,11 @@ export const useUserStore = defineStore('user', () => {
 
   // Initialize auth listener
   async function initialize() {
+    if (!supabase) {
+      console.warn('User store: Supabase not configured')
+      return
+    }
+
     try {
       // Get initial session
       const { data: { session: currentSession } } = await supabase.auth.getSession()
@@ -66,7 +71,7 @@ export const useUserStore = defineStore('user', () => {
 
   // Load user profile from database
   async function loadUserProfile() {
-    if (!user.value) return
+    if (!user.value || !supabase) return
 
     try {
       const { data, error: profileError } = await supabase
@@ -95,7 +100,7 @@ export const useUserStore = defineStore('user', () => {
 
   // Create user profile
   async function createUserProfile() {
-    if (!user.value) return
+    if (!user.value || !supabase) return
 
     const username = user.value.email?.split('@')[0] || `user_${Date.now()}`
     
@@ -116,6 +121,11 @@ export const useUserStore = defineStore('user', () => {
 
   // Authentication methods
   async function login(email: string, password: string) {
+    if (!supabase) {
+      error.value = 'Authentication not available'
+      return { success: false, error: error.value }
+    }
+
     isLoading.value = true
     error.value = null
 
@@ -137,6 +147,11 @@ export const useUserStore = defineStore('user', () => {
   }
 
   async function signup(email: string, password: string, username?: string) {
+    if (!supabase) {
+      error.value = 'Authentication not available'
+      return { success: false, error: error.value }
+    }
+
     isLoading.value = true
     error.value = null
 
@@ -161,6 +176,11 @@ export const useUserStore = defineStore('user', () => {
   }
 
   async function loginWithProvider(provider: 'google' | 'github') {
+    if (!supabase) {
+      error.value = 'Authentication not available'
+      return { success: false, error: error.value }
+    }
+
     try {
       const { error: authError } = await supabase.auth.signInWithOAuth({
         provider,
@@ -178,6 +198,15 @@ export const useUserStore = defineStore('user', () => {
   }
 
   async function logout() {
+    if (!supabase) {
+      // Just clear local state
+      user.value = null
+      session.value = null
+      userProfile.value = null
+      achievements.value = []
+      return
+    }
+
     try {
       const { error: signOutError } = await supabase.auth.signOut()
       if (signOutError) throw signOutError
@@ -193,7 +222,7 @@ export const useUserStore = defineStore('user', () => {
 
   // Profile management
   async function updateProfile(updates: Partial<UserProfile>) {
-    if (!user.value || !userProfile.value) return { success: false }
+    if (!user.value || !userProfile.value || !supabase) return { success: false }
 
     try {
       const { data, error: updateError } = await supabase
@@ -215,7 +244,7 @@ export const useUserStore = defineStore('user', () => {
 
   // Achievements
   async function loadAchievements() {
-    if (!user.value) return
+    if (!user.value || !supabase) return
 
     try {
       const { data, error: achError } = await supabase
@@ -274,6 +303,17 @@ export const useUserStore = defineStore('user', () => {
   // Initialize on store creation
   initialize()
 
+  // Computed stats for components
+  const stats = computed(() => ({
+    puzzlesCompleted: userProfile.value?.puzzles_completed || 0,
+    puzzlesAttempted: userProfile.value?.puzzles_attempted || 0,
+    totalScore: userProfile.value?.total_score || 0,
+    totalPlayTime: userProfile.value?.total_play_time || 0
+  }))
+
+  // Alias for compatibility
+  const loadStats = loadUserProfile
+
   return {
     // State
     user,
@@ -291,13 +331,16 @@ export const useUserStore = defineStore('user', () => {
     displayName,
     totalScore,
     completionRate,
+    stats,
     
     // Actions
+    initialize,
     login,
     signup,
     loginWithProvider,
     logout,
     loadAchievements,
+    loadStats,
     updateProfile,
     hasAchievement,
     updateGameStats

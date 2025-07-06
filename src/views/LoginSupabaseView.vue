@@ -51,6 +51,7 @@
               required
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               placeholder="you@example.com"
+              autocomplete="email"
             />
           </div>
 
@@ -66,6 +67,7 @@
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               placeholder="••••••••"
               :minlength="mode === 'signup' ? 6 : undefined"
+              :autocomplete="mode === 'signup' ? 'new-password' : 'current-password'"
             />
           </div>
 
@@ -80,7 +82,7 @@
               required
               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               placeholder="coolpuzzler123"
-              pattern="[a-zA-Z0-9_-]+"
+              pattern="^[a-zA-Z0-9_-]+$"
               title="Username can only contain letters, numbers, underscores, and hyphens"
             />
           </div>
@@ -359,17 +361,12 @@ async function handleMagicLink() {
 async function handleDemoLogin() {
   loading.value = true
   try {
-    // Create a demo account with timestamp
-    const timestamp = Date.now()
-    const demoEmail = `demo_${timestamp}@puzzlator.com`
-    const demoPassword = `demo_${timestamp}_pass`
-    
-    const result = await authStore.signUp(demoEmail, demoPassword, {
-      username: `guest_${timestamp}`,
-      is_demo: true
-    })
+    // Use the signInAsGuest method which handles both Supabase and demo mode
+    const result = await authStore.signInAsGuest()
     
     if (result.success) {
+      // Initialize user store with demo user
+      await userStore.initialize()
       router.push('/play')
     }
   } finally {
