@@ -155,6 +155,20 @@
           Generate New Puzzle
         </button>
         <button
+          @click="createAIPuzzle"
+          :disabled="!selectedType || !selectedDifficulty || !userStore.isLoggedIn"
+          :class="[
+            'ai-generate-button px-8 py-3 rounded-lg font-semibold text-lg transition-all flex items-center gap-2',
+            selectedType && selectedDifficulty && userStore.isLoggedIn
+              ? 'bg-gradient-to-r from-purple-600 to-blue-600 text-white hover:from-purple-700 hover:to-blue-700'
+              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+          ]"
+          :title="!userStore.isLoggedIn ? 'Login required for AI generation' : aiGenerationTooltip"
+        >
+          <Sparkles class="w-5 h-5" />
+          AI Generate
+        </button>
+        <button
           @click="showLeaderboard = true"
           class="px-8 py-3 bg-white border-2 border-purple-600 text-purple-600 rounded-lg font-semibold text-lg hover:bg-purple-50 transition-all"
         >
@@ -176,10 +190,12 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
-import { Grid3x3, Brain, Puzzle, Binary, Hash, Lightbulb, Type, Calculator, Star, Loader2 } from 'lucide-vue-next'
+import { Grid3x3, Brain, Puzzle, Binary, Hash, Lightbulb, Type, Calculator, Star, Loader2, Sparkles } from 'lucide-vue-next'
 import { supabase } from '@/config/supabase'
 import { useGameStore } from '@/stores/game'
 import { useUserStore } from '@/stores/user'
+import { aiPuzzleService } from '@/services/aiPuzzleService'
+import { useToast } from 'vue-toastification'
 import type { Database } from '@/types/db'
 
 type Puzzle = Database['public']['Tables']['puzzles']['Row']
@@ -188,6 +204,7 @@ type UserProfile = Database['public']['Tables']['user_profiles']['Row']
 const router = useRouter()
 const gameStore = useGameStore()
 const userStore = useUserStore()
+const toast = useToast()
 
 const selectedType = ref<string>('')
 const selectedDifficulty = ref<string>('')
@@ -198,6 +215,8 @@ const showLeaderboard = ref(false)
 const recentPuzzles = ref<Puzzle[]>([])
 const userProfile = ref<UserProfile | null>(null)
 const filterDifficulty = ref<string>('')
+const aiGenerationCount = ref(0)
+const aiGenerationLimit = ref(10)
 
 const puzzleTypes = [
   { id: 'sudoku4x4', name: 'Sudoku 4x4', icon: Grid3x3, description: 'Classic number puzzle' },
@@ -224,6 +243,14 @@ const filteredPuzzles = computed(() => {
   return recentPuzzles.value.filter(puzzle => puzzle.difficulty === filterDifficulty.value)
 })
 
+const aiGenerationTooltip = computed(() => {
+  const remaining = aiGenerationLimit.value - aiGenerationCount.value
+  if (remaining <= 0) {
+    return 'AI generation limit reached. Try again in an hour.'
+  }
+  return `AI-powered puzzle generation (${remaining} remaining this hour)`
+})
+
 onMounted(async () => {
   // Preload Phaser in the background for faster game loading
   import('@/utils/loadPhaser').then(({ preloadPhaser }) => preloadPhaser())
@@ -239,6 +266,12 @@ onMounted(async () => {
         .single()
       if (data) {
         userProfile.value = data
+      }
+      
+      // Check AI generation stats
+      const stats = await aiPuzzleService.getUserStats(userId)
+      if (stats) {
+        aiGenerationCount.value = stats.hourlyCount
       }
     } catch (error) {
       console.error('Failed to load user profile:', error)
@@ -368,6 +401,89 @@ async function createNewPuzzle() {
     setTimeout(() => {
       loading.value = false
     }, 2000)
+  }
+}
+
+async function createAIPuzzle() {
+  if (!selectedType.value || !selectedDifficulty.value) return
+  if (!userStore.isLoggedIn) {
+    toast.error('Please login to use AI puzzle generation')
+    return
+  }
+
+  loading.value = true
+  loadingMessage.value = 'Creating AI-powered puzzle...'
+
+  try {
+    // Check if user can generate
+    const canGenerate = await aiPuzzleService.canGeneratePuzzle(userStore.currentUserId!)
+    if (!canGenerate.allowed) {
+      toast.error(canGenerate.reason || 'Cannot generate puzzle at this time')
+      loading.value = false
+      return
+    }
+
+    // Get user performance data if available
+    const previousPerformance = userProfile.value ? {
+      averageTime: userProfile.value.average_solve_time || 300,
+      successRate: userProfile.value.puzzles_completed / Math.max(userProfile.value.puzzles_attempted, 1),
+      hintsUsed: 0.5 // Default value, would need to calculate from sessions
+    } : undefined
+
+    // Generate puzzle
+    const result = await aiPuzzleService.generatePuzzle({
+      type: selectedType.value as any,
+      difficulty: selectedDifficulty.value as any,
+      userLevel: userProfile.value?.level || 1,
+      previousPerformance
+    })
+
+    if (!result.success || !result.puzzle) {
+      throw new Error(result.error || 'Failed to generate puzzle')
+    }
+
+    // Create game session
+    let session: any
+    
+    if (supabase) {
+      const { data } = await supabase
+        .from('game_sessions')
+        .insert({
+          user_id: userStore.currentUserId!,
+          puzzle_id: result.puzzle.id,
+          game_state: result.puzzle.puzzle_data,
+          status: 'in_progress'
+        })
+        .select()
+        .single()
+      session = data
+    } else {
+      session = {
+        id: 'demo-session-' + Date.now(),
+        user_id: userStore.currentUserId!,
+        puzzle_id: result.puzzle.id,
+        game_state: result.puzzle.puzzle_data,
+        status: 'in_progress',
+        created_at: new Date().toISOString()
+      }
+    }
+
+    // Update AI generation count
+    const stats = await aiPuzzleService.getUserStats(userStore.currentUserId!)
+    if (stats) {
+      aiGenerationCount.value = stats.hourlyCount
+    }
+
+    // Navigate to game
+    gameStore.setCurrentPuzzle(result.puzzle)
+    gameStore.setCurrentSession(session)
+    
+    toast.success('AI puzzle generated successfully!')
+    router.push(`/play/${result.puzzle.id}`)
+  } catch (error: any) {
+    console.error('Failed to create AI puzzle:', error)
+    toast.error(error.message || 'Failed to generate AI puzzle')
+    loading.value = false
   }
 }
 
