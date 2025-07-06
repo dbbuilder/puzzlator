@@ -1,0 +1,256 @@
+/* Tutorial System Styles */
+
+/* Backdrop */
+.tutorial-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9998;
+  animation: fadeIn 0.3s ease-out;
+}
+
+/* Highlight */
+.tutorial-highlight {
+  position: relative;
+  z-index: 9999;
+  box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.4),
+              0 0 0 9999px rgba(0, 0, 0, 0.5);
+  animation: pulse 2s ease-in-out infinite;
+  border-radius: 8px;
+}
+
+/* Tooltip */
+.tutorial-tooltip {
+  position: fixed;
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  max-width: 400px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+  z-index: 10000;
+  animation: slideIn 0.3s ease-out;
+}
+
+.tutorial-tooltip-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: #1f2937;
+  margin: 0 0 0.5rem 0;
+}
+
+.tutorial-tooltip-content {
+  font-size: 1rem;
+  color: #4b5563;
+  line-height: 1.5;
+  margin: 0 0 1rem 0;
+}
+
+/* Progress Bar */
+.tutorial-progress {
+  height: 4px;
+  background: #e5e7eb;
+  border-radius: 2px;
+  margin: 1rem 0;
+  overflow: hidden;
+}
+
+.tutorial-progress-bar {
+  height: 100%;
+  background: #7c3aed;
+  transition: width 0.3s ease-out;
+}
+
+/* Actions */
+.tutorial-tooltip-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  align-items: center;
+  margin-top: 1rem;
+}
+
+/* Buttons */
+.tutorial-btn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.tutorial-btn:hover {
+  transform: translateY(-1px);
+}
+
+.tutorial-btn:active {
+  transform: translateY(0);
+}
+
+.tutorial-btn-primary {
+  background: #7c3aed;
+  color: white;
+}
+
+.tutorial-btn-primary:hover {
+  background: #6d28d9;
+}
+
+.tutorial-btn-secondary {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.tutorial-btn-secondary:hover {
+  background: #d1d5db;
+}
+
+.tutorial-btn-text {
+  background: transparent;
+  color: #6b7280;
+  padding: 0.5rem;
+}
+
+.tutorial-btn-text:hover {
+  color: #4b5563;
+}
+
+/* Arrow */
+.tutorial-tooltip-arrow {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  background: white;
+  transform: rotate(45deg);
+}
+
+.tutorial-tooltip-arrow-top {
+  bottom: -6px;
+  left: 50%;
+  margin-left: -6px;
+}
+
+.tutorial-tooltip-arrow-bottom {
+  top: -6px;
+  left: 50%;
+  margin-left: -6px;
+}
+
+.tutorial-tooltip-arrow-left {
+  right: -6px;
+  top: 50%;
+  margin-top: -6px;
+}
+
+.tutorial-tooltip-arrow-right {
+  left: -6px;
+  top: 50%;
+  margin-top: -6px;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 4px rgba(147, 51, 234, 0.4),
+                0 0 0 9999px rgba(0, 0, 0, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(147, 51, 234, 0.4),
+                0 0 0 9999px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .tutorial-tooltip {
+    background: #1f2937;
+    color: #f9fafb;
+  }
+  
+  .tutorial-tooltip-title {
+    color: #f9fafb;
+  }
+  
+  .tutorial-tooltip-content {
+    color: #d1d5db;
+  }
+  
+  .tutorial-progress {
+    background: #374151;
+  }
+  
+  .tutorial-btn-secondary {
+    background: #374151;
+    color: #f9fafb;
+  }
+  
+  .tutorial-btn-secondary:hover {
+    background: #4b5563;
+  }
+  
+  .tutorial-btn-text {
+    color: #9ca3af;
+  }
+  
+  .tutorial-btn-text:hover {
+    color: #d1d5db;
+  }
+  
+  .tutorial-tooltip-arrow {
+    background: #1f2937;
+  }
+}
+
+/* Mobile styles */
+@media (max-width: 640px) {
+  .tutorial-tooltip {
+    max-width: calc(100vw - 2rem);
+    margin: 1rem;
+  }
+  
+  .tutorial-tooltip-actions {
+    flex-wrap: wrap;
+  }
+  
+  .tutorial-btn {
+    font-size: 0.75rem;
+    padding: 0.375rem 0.75rem;
+  }
+}
+
+/* Accessibility */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
