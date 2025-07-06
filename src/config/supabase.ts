@@ -1,5 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
-import type { Database } from '@/types/database'
+import type { Database } from '@/types/database.generated'
 
 
 // Validate environment variables
@@ -69,7 +69,7 @@ export const supabase = (() => {
 })()
 
 // Export types for convenience
-export type { Database } from '@/types/database'
+export type { Database } from '@/types/database.generated'
 export type Tables<T extends keyof Database['public']['Tables']> = 
   Database['public']['Tables'][T]['Row']
 export type InsertTables<T extends keyof Database['public']['Tables']> = 

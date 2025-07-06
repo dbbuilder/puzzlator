@@ -1,4 +1,4 @@
-import type { Achievement, GameCompletionData } from '@/types/achievements'
+import type { Achievement, GameCompletionData, AchievementProgress } from '@/types/achievements'
 
 // Achievement definitions
 const ACHIEVEMENTS: Achievement[] = [
@@ -8,6 +8,7 @@ const ACHIEVEMENTS: Achievement[] = [
     name: 'First Steps',
     description: 'Complete your first puzzle',
     icon: '🎯',
+    category: 'gameplay',
     maxProgress: 1,
     rarity: 'common',
     unlockedAt: null,
@@ -18,6 +19,7 @@ const ACHIEVEMENTS: Achievement[] = [
     name: 'Quick Solver',
     description: 'Complete a puzzle in under 60 seconds',
     icon: '⚡',
+    category: 'speed',
     maxProgress: 1,
     rarity: 'uncommon',
     unlockedAt: null,
@@ -28,6 +30,7 @@ const ACHIEVEMENTS: Achievement[] = [
     name: 'Perfectionist',
     description: 'Complete a puzzle without any mistakes',
     icon: '✨',
+    category: 'perfection',
     maxProgress: 1,
     rarity: 'rare',
     unlockedAt: null,
@@ -38,6 +41,7 @@ const ACHIEVEMENTS: Achievement[] = [
     name: 'Independent Thinker',
     description: 'Complete a hard puzzle without using hints',
     icon: '🧠',
+    category: 'perfection',
     maxProgress: 1,
     rarity: 'rare',
     unlockedAt: null,
@@ -50,6 +54,7 @@ const ACHIEVEMENTS: Achievement[] = [
     name: 'Puzzle Enthusiast',
     description: 'Complete 10 puzzles',
     icon: '🏆',
+    category: 'milestones',
     maxProgress: 10,
     rarity: 'common',
     unlockedAt: null,
@@ -60,6 +65,7 @@ const ACHIEVEMENTS: Achievement[] = [
     name: 'Puzzle Master',
     description: 'Complete 50 puzzles',
     icon: '👑',
+    category: 'milestones',
     maxProgress: 50,
     rarity: 'uncommon',
     unlockedAt: null,
@@ -70,6 +76,7 @@ const ACHIEVEMENTS: Achievement[] = [
     name: 'Puzzle Legend',
     description: 'Complete 100 puzzles',
     icon: '🌟',
+    category: 'milestones',
     maxProgress: 100,
     rarity: 'epic',
     unlockedAt: null,
@@ -80,6 +87,7 @@ const ACHIEVEMENTS: Achievement[] = [
     name: 'Puzzle Deity',
     description: 'Complete 500 puzzles',
     icon: '🔮',
+    category: 'milestones',
     maxProgress: 500,
     rarity: 'legendary',
     unlockedAt: null,
@@ -92,6 +100,7 @@ const ACHIEVEMENTS: Achievement[] = [
     name: 'Variety Seeker',
     description: 'Complete puzzles of 5 different types',
     icon: '🎨',
+    category: 'exploration',
     maxProgress: 5,
     rarity: 'uncommon',
     unlockedAt: null,
@@ -102,6 +111,7 @@ const ACHIEVEMENTS: Achievement[] = [
     name: 'Difficulty Climber',
     description: 'Complete puzzles at all difficulty levels',
     icon: '📈',
+    category: 'exploration',
     maxProgress: 4,
     rarity: 'rare',
     unlockedAt: null,
@@ -114,6 +124,7 @@ const ACHIEVEMENTS: Achievement[] = [
     name: 'Daily Dedication',
     description: 'Play puzzles for 7 consecutive days',
     icon: '📅',
+    category: 'milestones',
     maxProgress: 7,
     rarity: 'rare',
     unlockedAt: null,
@@ -124,6 +135,7 @@ const ACHIEVEMENTS: Achievement[] = [
     name: 'High Scorer',
     description: 'Achieve a perfect score on any puzzle',
     icon: '💯',
+    category: 'perfection',
     maxProgress: 1,
     rarity: 'epic',
     unlockedAt: null,
@@ -134,6 +146,7 @@ const ACHIEVEMENTS: Achievement[] = [
     name: 'Speed Demon',
     description: 'Complete 10 puzzles in under 30 seconds each',
     icon: '🚀',
+    category: 'speed',
     maxProgress: 10,
     rarity: 'epic',
     unlockedAt: null,
@@ -144,6 +157,7 @@ const ACHIEVEMENTS: Achievement[] = [
     name: 'Marathon Runner',
     description: 'Play for 2 hours in a single session',
     icon: '🏃',
+    category: 'milestones',
     maxProgress: 1,
     rarity: 'uncommon',
     unlockedAt: null,
@@ -245,5 +259,38 @@ export const achievementService = {
       points,
       byRarity
     }
+  },
+
+  // Get progress updates for achievements based on game data
+  getProgressUpdates(gameData: GameCompletionData): AchievementProgress[] {
+    const updates: AchievementProgress[] = []
+
+    // Update puzzle count achievements
+    if (gameData.completed) {
+      ['puzzle-10', 'puzzle-50', 'puzzle-100', 'puzzle-500'].forEach(id => {
+        const achievement = this.getAchievementById(id)
+        if (achievement && achievement.progress < achievement.maxProgress) {
+          updates.push({
+            achievementId: id,
+            progress: achievement.progress + 1,
+            updatedAt: new Date()
+          })
+        }
+      })
+    }
+
+    // Update speed achievements
+    if (gameData.completed && gameData.time < 30) {
+      const speedDemon = this.getAchievementById('speed-demon')
+      if (speedDemon && speedDemon.progress < speedDemon.maxProgress) {
+        updates.push({
+          achievementId: 'speed-demon',
+          progress: speedDemon.progress + 1,
+          updatedAt: new Date()
+        })
+      }
+    }
+
+    return updates
   }
 }

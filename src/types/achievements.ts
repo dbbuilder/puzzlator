@@ -2,7 +2,7 @@
  * Achievement system types
  */
 
-export type AchievementRarity = 'common' | 'rare' | 'epic' | 'legendary'
+export type AchievementRarity = 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary'
 
 export type AchievementCategory = 
   | 'gameplay'
@@ -49,4 +49,15 @@ export interface AchievementNotificationData {
   achievement: Achievement
   isNew: boolean
   previousProgress?: number
+}
+
+export interface GameCompletionData {
+  puzzleType: string
+  difficulty: string
+  score: number
+  time: number
+  moves: number
+  hints: number
+  mistakes: number
+  completed: boolean
 }
