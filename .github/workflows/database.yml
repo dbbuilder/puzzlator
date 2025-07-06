@@ -39,21 +39,21 @@ jobs:
           cache: 'npm'
       
       - name: Install dependencies
-        run: |
-          npm ci
-          npm install -g supabase
+        run: npm ci
       
       - name: Setup Supabase CLI
-        run: |
-          supabase init
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
           
       - name: Run migrations
         env:
-          POSTGRES_HOST: localhost
+          POSTGRES_HOST: 127.0.0.1
           POSTGRES_PORT: 5432
           POSTGRES_DB: postgres
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
+          PGHOST: 127.0.0.1
         run: |
           # Apply migrations directly to test database
           for migration in supabase/migrations/*.sql; do
@@ -63,11 +63,12 @@ jobs:
       
       - name: Test database schema
         env:
-          POSTGRES_HOST: localhost
+          POSTGRES_HOST: 127.0.0.1
           POSTGRES_PORT: 5432
           POSTGRES_DB: postgres
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
+          PGHOST: 127.0.0.1
         run: |
           # Verify tables exist
           PGPASSWORD=$POSTGRES_PASSWORD psql -h $POSTGRES_HOST -U $POSTGRES_USER -d $POSTGRES_DB -c "\dt"
@@ -89,9 +90,7 @@ jobs:
           cache: 'npm'
       
       - name: Install dependencies
-        run: |
-          npm ci
-          npm install -g supabase
+        run: npm ci
       
       - name: Validate TypeScript types
         run: |
