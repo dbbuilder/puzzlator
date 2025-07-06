@@ -241,13 +241,35 @@ onMounted(async () => {
 
   // Load recent puzzles
   try {
-    const { data } = await supabase
-      .from('puzzles')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(6)
-    if (data) {
-      recentPuzzles.value = data
+    if (supabase) {
+      const { data } = await supabase
+        .from('puzzles')
+        .select('*')
+        .order('created_at', { ascending: false })
+        .limit(6)
+      if (data) {
+        recentPuzzles.value = data
+      }
+    } else {
+      // Demo mode - show sample puzzles
+      recentPuzzles.value = [
+        {
+          id: 'demo-1',
+          type: 'sudoku4x4',
+          difficulty: 'easy',
+          title: 'Sudoku 4x4 - Easy',
+          description: 'A simple 4x4 Sudoku puzzle',
+          created_at: new Date().toISOString()
+        },
+        {
+          id: 'demo-2',
+          type: 'sudoku4x4',
+          difficulty: 'medium',
+          title: 'Sudoku 4x4 - Medium',
+          description: 'A medium difficulty 4x4 Sudoku puzzle',
+          created_at: new Date().toISOString()
+        }
+      ] as any
     }
   } catch (error) {
     console.error('Failed to load recent puzzles:', error)
@@ -265,9 +287,12 @@ async function createNewPuzzle() {
     // In production, this would call an AI service
     const puzzleData = generateSamplePuzzle(selectedType.value, selectedDifficulty.value)
     
-    const { data: puzzle } = await supabase
-      .from('puzzles')
-      .insert({
+    let puzzle: any
+    
+    if (supabase) {
+      const { data } = await supabase
+        .from('puzzles')
+        .insert({
         type: selectedType.value as any,
         difficulty: selectedDifficulty.value as any,
         title: `${selectedType.value} Challenge`,
@@ -276,21 +301,56 @@ async function createNewPuzzle() {
         solution_data: puzzleData.solution,
         max_score: 1000,
         hint_penalty: 20
-      })
-      .select()
-      .single()
+        })
+        .select()
+        .single()
+      puzzle = data
+    } else {
+      // Demo mode - create local puzzle
+      puzzle = {
+        id: 'demo-puzzle-' + Date.now(),
+        type: selectedType.value,
+        difficulty: selectedDifficulty.value,
+        title: `${selectedType.value} Challenge`,
+        description: `A ${selectedDifficulty.value} ${selectedType.value} puzzle`,
+        puzzle_data: puzzleData.puzzle,
+        solution_data: puzzleData.solution,
+        max_score: 1000,
+        hint_penalty: 20,
+        created_at: new Date().toISOString()
+      }
+    }
+
+    if (!puzzle) {
+      throw new Error('Failed to create puzzle')
+    }
 
     // Create game session
-    const { data: session } = await supabase
-      .from('game_sessions')
-      .insert({
+    let session: any
+    
+    if (supabase) {
+      const { data } = await supabase
+        .from('game_sessions')
+        .insert({
         user_id: userStore.currentUserId!,
         puzzle_id: puzzle.id,
         game_state: puzzleData.puzzle,
         status: 'in_progress'
-      })
-      .select()
-      .single()
+        })
+        .select()
+        .single()
+      session = data
+    } else {
+      // Demo mode - create local session
+      session = {
+        id: 'demo-session-' + Date.now(),
+        user_id: userStore.currentUserId || 'demo-user',
+        puzzle_id: puzzle.id,
+        game_state: puzzleData.puzzle,
+        status: 'in_progress',
+        created_at: new Date().toISOString()
+      }
+    }
 
     // Navigate to game
     gameStore.setCurrentPuzzle(puzzle)

@@ -1,0 +1,79 @@
+name: Supabase Database Setup
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to setup'
+        required: true
+        default: 'production'
+        type: choice
+        options:
+        - production
+        - staging
+        - development
+
+jobs:
+  setup-database:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18'
+    
+    - name: Install PostgreSQL client
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y postgresql-client
+    
+    - name: Run Database Setup
+      env:
+        DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+      run: |
+        if [ -z "$DATABASE_URL" ]; then
+          echo "❌ Error: SUPABASE_DB_URL secret is not set"
+          echo "Please add SUPABASE_DB_URL to your GitHub repository secrets"
+          echo "Format: postgresql://postgres:[YOUR-PASSWORD]@db.[YOUR-PROJECT-REF].supabase.co:5432/postgres"
+          exit 1
+        fi
+        
+        echo "🚀 Setting up Supabase database..."
+        
+        # Run the setup script
+        psql "$DATABASE_URL" < scripts/setup-supabase-tables.sql
+        
+        echo "✅ Database setup complete!"
+    
+    - name: Verify Setup
+      env:
+        DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+      run: |
+        echo "🔍 Verifying database setup..."
+        
+        # Check if tables exist
+        TABLES=$(psql "$DATABASE_URL" -t -c "SELECT table_name FROM information_schema.tables WHERE table_schema = 'public' AND table_type = 'BASE TABLE';")
+        
+        echo "📋 Found tables:"
+        echo "$TABLES"
+        
+        # Check for required tables
+        for table in user_profiles puzzles game_sessions achievements user_achievements leaderboard; do
+          if echo "$TABLES" | grep -q "$table"; then
+            echo "✅ Table '$table' exists"
+          else
+            echo "❌ Table '$table' is missing"
+          fi
+        done
+    
+    - name: Create Setup Report
+      if: always()
+      run: |
+        echo "## Supabase Setup Report" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "- Environment: ${{ github.event.inputs.environment }}" >> $GITHUB_STEP_SUMMARY
+        echo "- Timestamp: $(date)" >> $GITHUB_STEP_SUMMARY
+        echo "- Status: Check the logs above" >> $GITHUB_STEP_SUMMARY

@@ -1,0 +1,54 @@
+name: Check Database Status
+
+on:
+  schedule:
+    - cron: '0 0 * * 0' # Weekly on Sunday
+  workflow_dispatch:
+
+jobs:
+  check-database:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Check Supabase Connection
+      id: check_connection
+      continue-on-error: true
+      run: |
+        # Check if we can connect to Supabase API
+        if [ -n "${{ secrets.VITE_SUPABASE_URL }}" ]; then
+          echo "✅ Supabase URL is configured"
+          echo "has_supabase=true" >> $GITHUB_OUTPUT
+          
+          # Try to fetch from the API
+          RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" \
+            "${{ secrets.VITE_SUPABASE_URL }}/rest/v1/" \
+            -H "apikey: ${{ secrets.VITE_SUPABASE_ANON_KEY }}" \
+            -H "Authorization: Bearer ${{ secrets.VITE_SUPABASE_ANON_KEY }}")
+          
+          if [ "$RESPONSE" = "200" ]; then
+            echo "✅ Supabase API is accessible"
+          else
+            echo "⚠️ Supabase API returned: $RESPONSE"
+          fi
+        else
+          echo "❌ Supabase is not configured"
+          echo "has_supabase=false" >> $GITHUB_OUTPUT
+        fi
+    
+    - name: Create Status Badge
+      run: |
+        if [ "${{ steps.check_connection.outputs.has_supabase }}" = "true" ]; then
+          echo "![Database Status](https://img.shields.io/badge/database-connected-success)" > database-status.md
+        else
+          echo "![Database Status](https://img.shields.io/badge/database-not%20configured-yellow)" > database-status.md
+        fi
+    
+    - name: Update README Status
+      if: github.event_name == 'schedule'
+      uses: EndBug/add-and-commit@v9
+      with:
+        add: 'database-status.md'
+        message: 'chore: update database status [skip ci]'
+        default_author: github_actions

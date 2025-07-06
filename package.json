@@ -1,6 +1,6 @@
 {
   "name": "puzzlator",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "private": true,
   "description": "Puzzlator - AI-powered puzzle game generator with dynamic challenges and interactive graphics",
   "type": "module",

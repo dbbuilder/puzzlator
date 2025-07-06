@@ -320,83 +320,26 @@ export const useAuthStore = defineStore('auth', () => {
 
   // Demo login (for when Supabase is not configured)
   async function signInAsGuest() {
-    if (supabase) {
-      // If Supabase is configured, create a temporary account
-      try {
-        const timestamp = Date.now()
-        const guestEmail = `guest_${timestamp}@puzzlator.com`
-        const guestPassword = `Guest_${timestamp}_Pass!`
-        
-        // Try to sign up as a new guest user
-        const { data, error } = await supabase.auth.signUp({
-          email: guestEmail,
-          password: guestPassword,
-          options: {
-            data: {
-              is_guest: true,
-              username: `guest_${timestamp}`
-            }
-          }
-        })
-        
-        if (error) throw error
-        
-        // Auto sign in after signup
-        if (data.user && !data.session) {
-          const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-            email: guestEmail,
-            password: guestPassword
-          })
-          if (signInError) throw signInError
-          toast.success('Welcome! Playing as guest')
-          return { success: true, data: signInData }
-        }
-        
-        toast.success('Welcome! Playing as guest')
-        return { success: true, data }
-      } catch (error: any) {
-        console.error('Guest sign in error:', error)
-        // Fallback to local demo mode
-        const demoUser = {
-          id: 'demo-user-' + Date.now(),
-          email: 'demo@puzzlator.com',
-          app_metadata: {},
-          user_metadata: { name: 'Demo User' },
-          aud: 'authenticated',
-          created_at: new Date().toISOString()
-        }
-        user.value = demoUser as any
-        session.value = {
-          access_token: 'demo-token',
-          refresh_token: 'demo-refresh',
-          expires_in: 3600,
-          token_type: 'bearer',
-          user: demoUser
-        } as any
-        toast.success('Welcome to demo mode!')
-        return { success: true, data: { user: demoUser, session: session.value } }
-      }
-    } else {
-      // Demo mode without Supabase
-      const demoUser = {
-        id: 'demo-user-' + Date.now(),
-        email: 'demo@puzzlator.com',
-        app_metadata: {},
-        user_metadata: { name: 'Demo User' },
-        aud: 'authenticated',
-        created_at: new Date().toISOString()
-      }
-      user.value = demoUser as any
-      session.value = {
-        access_token: 'demo-token',
-        refresh_token: 'demo-refresh',
-        expires_in: 3600,
-        token_type: 'bearer',
-        user: demoUser
-      } as any
-      toast.success('Welcome to demo mode!')
-      return { success: true, data: { user: demoUser, session: session.value } }
+    // Always use local demo mode for guest login
+    // Supabase requires email confirmation which doesn't work for instant guest access
+    const demoUser = {
+      id: 'demo-user-' + Date.now(),
+      email: 'demo@puzzlator.com',
+      app_metadata: {},
+      user_metadata: { name: 'Demo User', username: 'guest_' + Date.now() },
+      aud: 'authenticated',
+      created_at: new Date().toISOString()
     }
+    user.value = demoUser as any
+    session.value = {
+      access_token: 'demo-token',
+      refresh_token: 'demo-refresh',
+      expires_in: 3600,
+      token_type: 'bearer',
+      user: demoUser
+    } as any
+    toast.success('Welcome to demo mode!')
+    return { success: true, data: { user: demoUser, session: session.value } }
   }
 
   return {
