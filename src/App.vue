@@ -44,6 +44,9 @@
     
     <!-- PWA Install Prompt -->
     <InstallPrompt />
+    
+    <!-- Version Info -->
+    <VersionInfo v-if="showVersionInfo" />
   </div>
 </template>
 
@@ -60,6 +63,7 @@ import AppNavigation from '@/components/layout/AppNavigation.vue'
 import AchievementNotification from '@/components/achievements/AchievementNotification.vue'
 import TutorialOverlay from '@/components/tutorial/TutorialOverlay.vue'
 import InstallPrompt from '@/components/pwa/InstallPrompt.vue'
+import VersionInfo from '@/components/layout/VersionInfo.vue'
 // import AppFooter from '@/components/layout/AppFooter.vue'
 // import ErrorModal from '@/components/modals/ErrorModal.vue'
 // import AuthModal from '@/components/modals/AuthModal.vue'
@@ -79,6 +83,11 @@ const showNavigation = computed(() => {
   // Hide navigation on auth pages and game pages
   const hideOnRoutes = ['/login', '/signup']
   return !hideOnRoutes.some(routePath => route.path.startsWith(routePath))
+})
+
+const showVersionInfo = computed(() => {
+  // Show version info in development or if user has a special key combination
+  return import.meta.env.DEV || window.location.search.includes('version')
 })
 
 // Lifecycle

@@ -6,9 +6,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "build:optimized": "vite build --config vite.config.optimized.ts",
-    "build:analyze": "ANALYZE=true vite build --config vite.config.optimized.ts",
+    "build": "node scripts/generate-version.js && vite build",
+    "build:optimized": "node scripts/generate-version.js && vite build --config vite.config.optimized.ts",
+    "build:analyze": "ANALYZE=true node scripts/generate-version.js && vite build --config vite.config.optimized.ts",
     "build-with-types": "vue-tsc --noEmit -p tsconfig.build.json && vite build",
     "preview": "vite preview",
     "test": "vitest",

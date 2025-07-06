@@ -1,0 +1,9 @@
+{
+  "version": "0.6.0",
+  "name": "puzzlator",
+  "buildDate": "2025-07-06T21:10:17.782Z",
+  "commit": "cf463c0",
+  "branch": "main",
+  "environment": "development",
+  "nodejs": "v18.19.1"
+}
