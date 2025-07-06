@@ -123,7 +123,7 @@ import type { PuzzleMove } from '@/game/types/puzzle'
 import { useToast } from 'vue-toastification'
 import { useGameStore } from '@/stores/game'
 import { useUserStore } from '@/stores/user'
-import { api } from '@/services/api'
+import { supabase } from '@/config/supabase'
 
 const props = defineProps<{
   difficulty?: 'easy' | 'medium' | 'hard' | 'expert'
@@ -175,22 +175,41 @@ const initGame = async () => {
   
   if (puzzleId && !gameStore.currentPuzzle) {
     // Load puzzle from database
-    const puzzleData = await api.getPuzzle(puzzleId)
+    const { data: puzzleData } = await supabase
+      .from('puzzles')
+      .select('*')
+      .eq('id', puzzleId)
+      .single()
     if (puzzleData) {
       gameStore.setCurrentPuzzle(puzzleData)
       
       // Check for existing session
-      const session = await api.getActiveGameSession(userStore.currentUserId!, puzzleId)
-      if (session) {
-        gameStore.setCurrentSession(session)
+      const { data: sessions } = await supabase
+        .from('game_sessions')
+        .select('*')
+        .eq('user_id', userStore.currentUserId!)
+        .eq('puzzle_id', puzzleId)
+        .eq('status', 'in_progress')
+        .order('created_at', { ascending: false })
+        .limit(1)
+      
+      if (sessions && sessions.length > 0) {
+        gameStore.setCurrentSession(sessions[0])
       } else {
         // Create new session
-        const newSession = await api.createGameSession({
-          user_id: userStore.currentUserId!,
-          puzzle_id: puzzleId,
-          game_state: puzzleData.puzzle_data
-        })
-        gameStore.setCurrentSession(newSession)
+        const { data: newSession } = await supabase
+          .from('game_sessions')
+          .insert({
+            user_id: userStore.currentUserId!,
+            puzzle_id: puzzleId,
+            game_state: puzzleData.puzzle_data,
+            status: 'in_progress'
+          })
+          .select()
+          .single()
+        if (newSession) {
+          gameStore.setCurrentSession(newSession)
+        }
       }
     }
   }

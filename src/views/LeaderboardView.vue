@@ -132,7 +132,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { api } from '@/services/api'
+import { supabase } from '@/config/supabase'
 
 const selectedType = ref('')
 const selectedDifficulty = ref('')
@@ -145,17 +145,28 @@ onMounted(() => {
 
 async function loadLeaderboard() {
   try {
-    const filters: any = {
-      period_type: selectedPeriod.value,
-      limit: 50
+    let query = supabase
+      .from('leaderboard')
+      .select('*')
+      .eq('period_type', selectedPeriod.value)
+      .order('score', { ascending: false })
+      .limit(50)
+    
+    if (selectedType.value) {
+      query = query.eq('puzzle_type', selectedType.value)
+    }
+    if (selectedDifficulty.value) {
+      query = query.eq('difficulty', selectedDifficulty.value)
     }
     
-    if (selectedType.value) filters.puzzle_type = selectedType.value
-    if (selectedDifficulty.value) filters.difficulty = selectedDifficulty.value
+    const { data, error } = await query
     
-    leaderboardEntries.value = await api.getLeaderboard(filters)
+    if (error) throw error
+    
+    leaderboardEntries.value = data || []
   } catch (error) {
     console.error('Failed to load leaderboard:', error)
+    leaderboardEntries.value = []
   }
 }
 

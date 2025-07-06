@@ -176,6 +176,11 @@
           Just want to try? <span class="text-purple-600">Continue as guest</span>
         </button>
       </div>
+      
+      <!-- Version Info -->
+      <div class="mt-4 text-center">
+        <p class="text-xs text-gray-400">v{{ version }} • Build {{ buildTime }}</p>
+      </div>
     </div>
 
     <!-- Password Reset Modal -->
@@ -265,10 +270,15 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth-supabase'
 import { useUserStore } from '@/stores/user-supabase'
+import { APP_VERSION, BUILD_NUMBER, getBuildInfo } from '@/config/version'
 
 const router = useRouter()
 const authStore = useAuthStore()
 const userStore = useUserStore()
+
+// Version info
+const version = APP_VERSION
+const buildTime = `#${BUILD_NUMBER} - ${getBuildInfo()}`
 
 // Form state
 const mode = ref<'signin' | 'signup'>('signin')

@@ -174,7 +174,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRouter, RouterLink } from 'vue-router'
 import { Grid3x3, Brain, Puzzle, Binary, Hash, Lightbulb, Type, Calculator, Star, Loader2 } from 'lucide-vue-next'
-import { api } from '@/services/api'
+import { supabase } from '@/config/supabase'
 import { useGameStore } from '@/stores/game'
 import { useUserStore } from '@/stores/user'
 import type { Database } from '@/types/db'
@@ -226,7 +226,14 @@ onMounted(async () => {
   const userId = userStore.currentUserId
   if (userId) {
     try {
-      userProfile.value = await api.getUserProfile(userId)
+      const { data } = await supabase
+        .from('user_profiles')
+        .select('*')
+        .eq('id', userId)
+        .single()
+      if (data) {
+        userProfile.value = data
+      }
     } catch (error) {
       console.error('Failed to load user profile:', error)
     }
@@ -234,7 +241,14 @@ onMounted(async () => {
 
   // Load recent puzzles
   try {
-    recentPuzzles.value = await api.getPuzzles({ limit: 6 })
+    const { data } = await supabase
+      .from('puzzles')
+      .select('*')
+      .order('created_at', { ascending: false })
+      .limit(6)
+    if (data) {
+      recentPuzzles.value = data
+    }
   } catch (error) {
     console.error('Failed to load recent puzzles:', error)
   }
@@ -251,23 +265,32 @@ async function createNewPuzzle() {
     // In production, this would call an AI service
     const puzzleData = generateSamplePuzzle(selectedType.value, selectedDifficulty.value)
     
-    const puzzle = await api.createPuzzle({
-      type: selectedType.value as any,
-      difficulty: selectedDifficulty.value as any,
-      title: `${selectedType.value} Challenge`,
-      description: `A ${selectedDifficulty.value} ${selectedType.value} puzzle`,
-      puzzle_data: puzzleData.puzzle,
-      solution_data: puzzleData.solution,
-      max_score: 1000,
-      hint_penalty: 20
-    })
+    const { data: puzzle } = await supabase
+      .from('puzzles')
+      .insert({
+        type: selectedType.value as any,
+        difficulty: selectedDifficulty.value as any,
+        title: `${selectedType.value} Challenge`,
+        description: `A ${selectedDifficulty.value} ${selectedType.value} puzzle`,
+        puzzle_data: puzzleData.puzzle,
+        solution_data: puzzleData.solution,
+        max_score: 1000,
+        hint_penalty: 20
+      })
+      .select()
+      .single()
 
     // Create game session
-    const session = await api.createGameSession({
-      user_id: userStore.currentUserId!,
-      puzzle_id: puzzle.id,
-      game_state: puzzleData.puzzle
-    })
+    const { data: session } = await supabase
+      .from('game_sessions')
+      .insert({
+        user_id: userStore.currentUserId!,
+        puzzle_id: puzzle.id,
+        game_state: puzzleData.puzzle,
+        status: 'in_progress'
+      })
+      .select()
+      .single()
 
     // Navigate to game
     gameStore.setCurrentPuzzle(puzzle)
