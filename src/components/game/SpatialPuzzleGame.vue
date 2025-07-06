@@ -251,7 +251,7 @@ const resetPuzzle = () => {
   toast.info('Puzzle reset!')
 }
 
-const handleCompletion = (data: { score: number; puzzle: SpatialPuzzle }) => {
+const handleCompletion = async (data: { score: number; puzzle: SpatialPuzzle }) => {
   if (isCompleted.value) return
   
   isCompleted.value = true

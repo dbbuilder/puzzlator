@@ -224,7 +224,7 @@ const resetPuzzle = () => {
   toast.info('Puzzle reset!')
 }
 
-const handleCompletion = (data: { score: number; puzzle: PatternMatchingPuzzle }) => {
+const handleCompletion = async (data: { score: number; puzzle: PatternMatchingPuzzle }) => {
   if (isCompleted.value) return
   
   isCompleted.value = true
