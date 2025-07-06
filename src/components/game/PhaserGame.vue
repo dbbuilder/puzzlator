@@ -438,13 +438,13 @@ const handleCompletion = async () => {
   // Check for achievements
   const achievementsStore = useAchievementsStore()
   const gameData = {
-    puzzleType: puzzle.value.type,
-    difficulty: puzzle.value.difficulty,
+    puzzleType: gameStore.currentPuzzle?.type || 'sudoku4x4',
+    difficulty: gameStore.currentPuzzle?.difficulty || 'medium',
     score: gameStore.currentScore,
     time: gameStore.timeElapsed,
-    moves: gameStore.totalMoves,
+    moves: gameStore.movesCount,
     hints: gameStore.hintsUsed,
-    mistakes: puzzle.value.getMistakes ? puzzle.value.getMistakes() : 0,
+    mistakes: puzzle.value?.getMistakeCount ? puzzle.value.getMistakeCount() : 0,
     completed: true
   }
   achievementsStore.checkAndUnlockAchievements(gameData)

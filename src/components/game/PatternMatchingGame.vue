@@ -152,7 +152,7 @@ const initGame = async () => {
     physics: {
       default: 'arcade',
       arcade: {
-        gravity: { y: 0 },
+        gravity: { x: 0, y: 0 },
         debug: false
       }
     }
@@ -231,8 +231,9 @@ const handleCompletion = (data: { score: number; puzzle: PatternMatchingPuzzle }
   score.value = data.score
   stopTimer()
   
-  // Update game store
-  gameStore.completeGame(data.score)
+  // Update game store with score
+  gameStore.updateScore(data.score)
+  await gameStore.completeGame()
   
   // Check for achievements
   const gameData = {

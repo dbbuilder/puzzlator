@@ -203,7 +203,7 @@ async function handleSubmit() {
       }
     }
   } else {
-    const { success } = await authStore.signUp(email.value, password.value, username.value)
+    const { success } = await authStore.signUp(email.value, password.value, { username: username.value })
     if (success) {
       appStore.closeAuthModal()
       resetForm()

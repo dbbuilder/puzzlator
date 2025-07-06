@@ -515,16 +515,17 @@ export class SpatialPuzzleScene extends Phaser.Scene {
   }
 
   private shakeObject(obj: Phaser.GameObjects.GameObject) {
-    const originalX = obj.x
+    const sprite = obj as Phaser.GameObjects.Sprite
+    const originalX = sprite.x
     
     this.tweens.add({
-      targets: obj,
+      targets: sprite,
       x: originalX + 10,
       duration: 50,
       yoyo: true,
       repeat: 3,
       onComplete: () => {
-        obj.x = originalX
+        sprite.x = originalX
       }
     })
   }
