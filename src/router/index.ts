@@ -32,7 +32,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/play/:puzzleId',
     name: 'game',
-    component: () => import('@/components/game/PhaserGame.vue'),
+    component: () => import('@/views/GameView.vue'),
     meta: {
       title: 'Play',
       requiresAuth: true

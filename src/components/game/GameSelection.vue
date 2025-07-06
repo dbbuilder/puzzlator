@@ -392,6 +392,25 @@ function generateSamplePuzzle(type: string, difficulty: string) {
     return { puzzle, solution }
   }
   
+  if (type === 'pattern') {
+    // Generate pattern puzzle metadata
+    const patternTypes = {
+      easy: 'numeric',
+      medium: 'shapes',
+      hard: 'colors',
+      expert: 'mixed'
+    }
+    
+    return {
+      puzzle: { 
+        type, 
+        difficulty, 
+        patternType: patternTypes[difficulty as keyof typeof patternTypes] || 'numeric'
+      },
+      solution: { type, difficulty }
+    }
+  }
+  
   // Default puzzle data
   return {
     puzzle: { type, difficulty, data: {} },
