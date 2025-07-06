@@ -11,11 +11,16 @@ const localStorageMock = {
 }
 Object.defineProperty(window, 'localStorage', { value: localStorageMock })
 
+// Mock scrollIntoView
+Element.prototype.scrollIntoView = vi.fn()
+
 describe('TutorialService', () => {
   let tutorialService: TutorialService
 
   beforeEach(() => {
     vi.clearAllMocks()
+    // Reset localStorage mock to return null by default
+    localStorageMock.getItem.mockReturnValue(null)
     tutorialService = new TutorialService()
   })
 
@@ -28,7 +33,10 @@ describe('TutorialService', () => {
     })
 
     it('does not show tutorial for returning users', () => {
-      localStorageMock.getItem.mockReturnValue('completed')
+      localStorageMock.getItem.mockImplementation((key) => {
+        if (key === 'puzzlator_tutorial_completed') return '2024-01-01'
+        return null
+      })
       
       const shouldShow = tutorialService.shouldShowTutorial()
       expect(shouldShow).toBe(false)
@@ -42,7 +50,8 @@ describe('TutorialService', () => {
       expect(steps[0]).toHaveProperty('id')
       expect(steps[0]).toHaveProperty('title')
       expect(steps[0]).toHaveProperty('content')
-      expect(steps[0]).toHaveProperty('target')
+      // First step is welcome step with no target
+      expect(steps[1]).toHaveProperty('target')
     })
 
     it('tracks tutorial progress', () => {
@@ -72,6 +81,13 @@ describe('TutorialService', () => {
         'puzzlator_tutorial_completed',
         expect.any(String)
       )
+      
+      // Mock the completed state for the isCompleted check
+      localStorageMock.getItem.mockImplementation((key) => {
+        if (key === 'puzzlator_tutorial_completed') return '2024-01-01'
+        return null
+      })
+      
       expect(tutorialService.isCompleted()).toBe(true)
     })
   })
@@ -81,6 +97,7 @@ describe('TutorialService', () => {
       const steps = tutorialService.getTutorialSteps('game-selection')
       
       const expectedTargets = [
+        undefined, // welcome step has no target
         '.puzzle-types',
         '.difficulty-selector',
         '.generate-button',
@@ -88,16 +105,16 @@ describe('TutorialService', () => {
       ]
       
       steps.forEach((step, index) => {
-        expect(step.target).toBe(expectedTargets[index] || null)
+        expect(step.target).toBe(expectedTargets[index])
       })
     })
 
     it('provides in-game tutorial steps', () => {
       const steps = tutorialService.getTutorialSteps('sudoku-game')
       
-      expect(steps.some(s => s.title.includes('Select a cell'))).toBe(true)
-      expect(steps.some(s => s.title.includes('hints'))).toBe(true)
-      expect(steps.some(s => s.title.includes('undo'))).toBe(true)
+      expect(steps.some(s => s.title.includes('Select a Cell'))).toBe(true)
+      expect(steps.some(s => s.title.toLowerCase().includes('help'))).toBe(true)
+      expect(steps.some(s => s.title.toLowerCase().includes('mistake'))).toBe(true)
     })
 
     it('provides settings tutorial steps', () => {
@@ -130,6 +147,11 @@ describe('TutorialService', () => {
     })
 
     it('waits for user actions', async () => {
+      // Create the test button
+      const button = document.createElement('button')
+      button.className = 'test-button'
+      document.body.appendChild(button)
+      
       const step: TutorialStep = {
         id: 'test',
         title: 'Click the button',
@@ -141,11 +163,16 @@ describe('TutorialService', () => {
       
       const promise = tutorialService.waitForAction(step)
       
-      // Simulate user action
-      const event = new Event('click')
-      document.querySelector('.test-button')?.dispatchEvent(event)
+      // Simulate user action after a small delay
+      setTimeout(() => {
+        const event = new Event('click')
+        button.dispatchEvent(event)
+      }, 10)
       
       await expect(promise).resolves.toBe(true)
+      
+      // Clean up
+      document.body.removeChild(button)
     })
 
     it('shows tooltips for steps', () => {
@@ -178,10 +205,19 @@ describe('TutorialService', () => {
     })
 
     it('resumes tutorial from last position', () => {
-      localStorageMock.getItem.mockReturnValue(JSON.stringify({
+      const mockProgress: TutorialProgress = {
         currentStep: 3,
-        context: 'game-selection'
-      }))
+        totalSteps: 5,
+        context: 'game-selection',
+        startedAt: new Date().toISOString(),
+        lastUpdated: new Date().toISOString(),
+        completedSteps: ['welcome', 'puzzle-types', 'difficulty']
+      }
+      
+      localStorageMock.getItem.mockImplementation((key) => {
+        if (key === 'puzzlator_tutorial_progress') return JSON.stringify(mockProgress)
+        return null
+      })
       
       tutorialService.resumeTutorial()
       

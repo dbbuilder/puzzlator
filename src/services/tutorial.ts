@@ -9,7 +9,7 @@ import type {
 import { TUTORIAL_STEPS } from '@/types/tutorial'
 
 export class TutorialService {
-  private isActive = false
+  private _isActive = false
   private currentStep = 0
   private currentContext: TutorialContext = 'game-selection'
   private startTime: number = 0
@@ -54,7 +54,7 @@ export class TutorialService {
    * Start the tutorial
    */
   startTutorial(context: TutorialContext = 'game-selection'): void {
-    this.isActive = true
+    this._isActive = true
     this.currentContext = context
     this.currentStep = 0
     this.startTime = Date.now()
@@ -109,7 +109,7 @@ export class TutorialService {
    * Complete the tutorial
    */
   completeTutorial(): void {
-    this.isActive = false
+    this._isActive = false
     this.completedSections.add(this.currentContext)
     
     localStorage.setItem('puzzlator_tutorial_completed', new Date().toISOString())
@@ -122,7 +122,7 @@ export class TutorialService {
    * Skip the tutorial
    */
   skipTutorial(): void {
-    this.isActive = false
+    this._isActive = false
     localStorage.setItem('puzzlator_tutorial_skipped', 'true')
     
     this.cleanup()
@@ -136,10 +136,10 @@ export class TutorialService {
   }
 
   /**
-   * Check if tutorial is active
+   * Check if tutorial is currently active
    */
   isActive(): boolean {
-    return this.isActive
+    return this._isActive
   }
 
   /**
@@ -151,7 +151,7 @@ export class TutorialService {
     if (progress) {
       this.currentStep = progress.currentStep
       this.currentContext = progress.context as TutorialContext
-      this.isActive = true
+      this._isActive = true
       this.startTime = Date.now()
       
       if (this.options.keyboardNavigation) {
@@ -171,7 +171,7 @@ export class TutorialService {
    */
   resetTutorial(): void {
     this.currentStep = 0
-    this.isActive = false
+    this._isActive = false
     this.completedSteps.clear()
     this.completedSections.clear()
     
@@ -212,7 +212,7 @@ export class TutorialService {
    */
   getStatistics(): TutorialStatistics {
     const allSteps = Object.values(TUTORIAL_STEPS).flat()
-    const timeSpent = this.isActive ? Math.floor((Date.now() - this.startTime) / 1000) : 0
+    const timeSpent = this._isActive ? Math.floor((Date.now() - this.startTime) / 1000) : 0
     
     return {
       totalSteps: allSteps.length,
@@ -237,7 +237,9 @@ export class TutorialService {
     element.classList.add('tutorial-highlight')
     
     // Scroll into view
-    element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    if (element.scrollIntoView) {
+      element.scrollIntoView({ behavior: 'smooth', block: 'center' })
+    }
     
     // Create tooltip
     if (this.activeTooltip) {
@@ -348,7 +350,7 @@ export class TutorialService {
    * Handle keyboard navigation
    */
   handleKeyboard(event: KeyboardEvent): void {
-    if (!this.isActive) return
+    if (!this._isActive) return
     
     switch (event.key) {
       case 'ArrowRight':
