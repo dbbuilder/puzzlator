@@ -41,6 +41,9 @@
       @tutorial-complete="handleTutorialComplete"
       @tutorial-skip="handleTutorialSkip"
     />
+    
+    <!-- PWA Install Prompt -->
+    <InstallPrompt />
   </div>
 </template>
 
@@ -56,6 +59,7 @@ import type { Achievement } from '@/types/achievements'
 import AppNavigation from '@/components/layout/AppNavigation.vue'
 import AchievementNotification from '@/components/achievements/AchievementNotification.vue'
 import TutorialOverlay from '@/components/tutorial/TutorialOverlay.vue'
+import InstallPrompt from '@/components/pwa/InstallPrompt.vue'
 // import AppFooter from '@/components/layout/AppFooter.vue'
 // import ErrorModal from '@/components/modals/ErrorModal.vue'
 // import AuthModal from '@/components/modals/AuthModal.vue'

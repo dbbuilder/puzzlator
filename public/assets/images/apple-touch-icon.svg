@@ -1,0 +1,10 @@
+<svg width="180" height="180" viewBox="0 0 180 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="180" height="180" rx="40" fill="#7C3AED"/>
+  <g opacity="0.9">
+    <rect x="34" y="34" width="45" height="45" rx="5.3999999999999995" fill="white"/>
+    <rect x="90" y="34" width="45" height="45" rx="5.3999999999999995" fill="white" opacity="0.8"/>
+    <rect x="34" y="90" width="45" height="45" rx="5.3999999999999995" fill="white" opacity="0.8"/>
+    <rect x="90" y="90" width="45" height="45" rx="5.3999999999999995" fill="white" opacity="0.6"/>
+  </g>
+  <text x="90" y="103" text-anchor="middle" font-family="Arial, sans-serif" font-size="63" font-weight="bold" fill="#7C3AED">P</text>
+</svg>
