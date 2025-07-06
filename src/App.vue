@@ -83,29 +83,17 @@ async function preloadResources() {
   // Preload critical game assets
   const criticalAssets = [
     '/assets/images/logo.svg',
-    '/assets/sounds/success.mp3',
-    '/assets/sounds/error.mp3',
   ]
   
   const preloadPromises = criticalAssets.map(asset => {
     return new Promise((resolve) => {
-      if (asset.endsWith('.mp3')) {
-        const audio = new Audio(asset)
-        audio.addEventListener('canplaythrough', resolve)
-        audio.addEventListener('error', () => {
-          console.log(`Optional sound file not found: ${asset}`)
-          resolve(undefined) // Don't fail on missing sounds
-        })
-        audio.load()
-      } else {
-        const img = new Image()
-        img.onload = resolve
-        img.onerror = () => {
-          console.log(`Optional image not found: ${asset}`)
-          resolve(undefined) // Don't fail on missing images
-        }
-        img.src = asset
+      const img = new Image()
+      img.onload = resolve
+      img.onerror = () => {
+        console.log(`Optional image not found: ${asset}`)
+        resolve(undefined) // Don't fail on missing images
       }
+      img.src = asset
     })
   })
   
@@ -114,6 +102,10 @@ async function preloadResources() {
   } catch (error) {
     console.warn('Some assets failed to preload:', error)
   }
+  
+  // Preload sounds using the sound utility
+  const { preloadSounds } = await import('@/utils/sounds')
+  preloadSounds()
 }
 </script>
 
