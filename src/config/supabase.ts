@@ -1,6 +1,13 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/types/database'
 
+// Debug environment variables in production
+if (import.meta.env.PROD) {
+  console.log('Production environment detected')
+  console.log('VITE_SUPABASE_URL exists:', !!import.meta.env.VITE_SUPABASE_URL)
+  console.log('VITE_SUPABASE_ANON_KEY exists:', !!import.meta.env.VITE_SUPABASE_ANON_KEY)
+}
+
 // Validate environment variables
 function validateEnvironment(): { url: string; anonKey: string } {
   const url = import.meta.env.VITE_SUPABASE_URL
