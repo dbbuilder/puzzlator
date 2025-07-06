@@ -19,16 +19,33 @@ export default defineConfig({
   build: {
     target: 'esnext',
     sourcemap: true,
+    minify: 'terser',
+    terserOptions: {
+      compress: {
+        drop_console: true,
+        drop_debugger: true
+      }
+    },
     rollupOptions: {
       output: {
         manualChunks: {
-          vendor: ['vue', 'vue-router', 'pinia'],
-          // supabase: ['@supabase/supabase-js'], // Disabled - using custom auth
-          phaser: ['phaser'],
-          ai: ['openai'],
+          // Core Vue ecosystem
+          'vue-vendor': ['vue', 'vue-router', 'pinia'],
+          // Supabase client
+          'supabase': ['@supabase/supabase-js'],
+          // Phaser game engine (largest dependency)
+          'phaser': ['phaser'],
+          // UI components
+          'ui-vendor': ['lucide-vue-next', 'vue-toastification'],
         },
+        // Better chunk naming
+        chunkFileNames: 'assets/js/[name]-[hash].js',
+        entryFileNames: 'assets/js/[name]-[hash].js',
+        assetFileNames: 'assets/[ext]/[name]-[hash].[ext]'
       },
     },
+    // Increase warning limit for Phaser
+    chunkSizeWarningLimit: 1500
   },
   optimizeDeps: {
     include: ['phaser'],

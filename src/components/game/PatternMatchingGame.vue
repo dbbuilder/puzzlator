@@ -64,7 +64,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import Phaser from 'phaser'
+import { loadPhaser } from '@/utils/loadPhaser'
 import {
   Clock,
   Trophy,
@@ -121,10 +121,13 @@ const formattedTime = computed(() => {
 })
 
 // Methods
-const initGame = () => {
+const initGame = async () => {
   if (game) {
     game.destroy(true)
   }
+
+  // Load Phaser dynamically
+  const Phaser = await loadPhaser()
 
   // Create puzzle instance
   puzzle = new PatternMatchingPuzzle(props.difficulty || 'medium')

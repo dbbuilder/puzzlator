@@ -222,6 +222,9 @@ const filteredPuzzles = computed(() => {
 })
 
 onMounted(async () => {
+  // Preload Phaser in the background for faster game loading
+  import('@/utils/loadPhaser').then(({ preloadPhaser }) => preloadPhaser())
+  
   // Load user profile
   const userId = userStore.currentUserId
   if (userId) {

@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
 
-// Define routes
+// Define routes with webpackChunkName for better debugging
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
@@ -14,7 +14,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/login',
     name: 'login',
-    component: () => import('@/views/LoginSupabaseView.vue'),
+    component: () => import(/* webpackChunkName: "login" */ '@/views/LoginSupabaseView.vue'),
     meta: {
       title: 'Login',
       requiresAuth: false
@@ -23,16 +23,17 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/play',
     name: 'play',
-    component: () => import('@/components/game/GameSelection.vue'),
+    component: () => import(/* webpackChunkName: "game-selection" */ '@/components/game/GameSelection.vue'),
     meta: {
       title: 'Select Game',
-      requiresAuth: true
+      requiresAuth: true,
+      prefetch: true // Prefetch game selection after login
     }
   },
   {
     path: '/play/:puzzleId',
     name: 'game',
-    component: () => import('@/views/GameView.vue'),
+    component: () => import(/* webpackChunkName: "game-view" */ '@/views/GameView.vue'),
     meta: {
       title: 'Play',
       requiresAuth: true
@@ -41,7 +42,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/profile',
     name: 'profile',
-    component: () => import('@/views/ProfileView.vue'),
+    component: () => import(/* webpackChunkName: "profile" */ '@/views/ProfileView.vue'),
     meta: {
       title: 'Profile',
       requiresAuth: true
@@ -50,7 +51,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/leaderboard',
     name: 'leaderboard',
-    component: () => import('@/views/LeaderboardView.vue'),
+    component: () => import(/* webpackChunkName: "leaderboard" */ '@/views/LeaderboardView.vue'),
     meta: {
       title: 'Leaderboard',
       requiresAuth: false
@@ -59,7 +60,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/achievements',
     name: 'achievements',
-    component: () => import('@/views/AchievementsView.vue'),
+    component: () => import(/* webpackChunkName: "achievements" */ '@/views/AchievementsView.vue'),
     meta: {
       title: 'Achievements',
       requiresAuth: false
@@ -68,7 +69,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/:pathMatch(.*)*',
     name: 'not-found',
-    component: () => import('@/views/NotFoundView.vue'),
+    component: () => import(/* webpackChunkName: "not-found" */ '@/views/NotFoundView.vue'),
     meta: {
       title: '404 - Not Found'
     }
@@ -107,6 +108,26 @@ router.beforeEach(async (to, from, next) => {
     next({ name: 'login', query: { redirect: to.fullPath } })
   } else {
     next()
+  }
+})
+
+// After navigation, prefetch likely next routes
+router.afterEach((to) => {
+  // Prefetch strategies based on current route
+  if (to.name === 'login' && router.hasRoute('play')) {
+    // After login, user likely goes to game selection
+    router.resolve({ name: 'play' }).matched.forEach(route => {
+      if (route.components?.default && typeof route.components.default === 'function') {
+        (route.components.default as () => Promise<any>)()
+      }
+    })
+  } else if (to.name === 'play') {
+    // On game selection, prefetch game view since user will select a game
+    router.resolve({ name: 'game', params: { puzzleId: 'placeholder' } }).matched.forEach(route => {
+      if (route.components?.default && typeof route.components.default === 'function') {
+        (route.components.default as () => Promise<any>)()
+      }
+    })
   }
 })
 

@@ -107,7 +107,7 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import Phaser from 'phaser'
+import { loadPhaser } from '@/utils/loadPhaser'
 import {
   Clock,
   Trophy,
@@ -215,6 +215,9 @@ const initGame = async () => {
     }
   }
 
+  // Load Phaser dynamically
+  const Phaser = await loadPhaser()
+  
   // Create puzzle instance
   puzzle.value = new Sudoku4x4()
   
