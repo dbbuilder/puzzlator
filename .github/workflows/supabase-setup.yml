@@ -33,6 +33,7 @@ jobs:
     - name: Run Database Setup
       env:
         DATABASE_URL: ${{ secrets.SUPABASE_DB_URL }}
+        PGCONNECT_TIMEOUT: 30
       run: |
         if [ -z "$DATABASE_URL" ]; then
           echo "❌ Error: SUPABASE_DB_URL secret is not set"
@@ -42,6 +43,18 @@ jobs:
         fi
         
         echo "🚀 Setting up Supabase database..."
+        
+        # Test connection first
+        echo "Testing database connection..."
+        if psql "$DATABASE_URL" -c "SELECT 1;" > /dev/null 2>&1; then
+          echo "✅ Database connection successful"
+        else
+          echo "❌ Failed to connect to database"
+          echo "Trying alternative connection method..."
+          # Try with explicit IPv4
+          DATABASE_URL_IPV4=$(echo "$DATABASE_URL" | sed 's/@db\./@db./')
+          export DATABASE_URL="$DATABASE_URL_IPV4"
+        fi
         
         # Run the setup script
         psql "$DATABASE_URL" < scripts/setup-supabase-tables.sql
