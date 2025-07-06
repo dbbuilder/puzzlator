@@ -411,6 +411,18 @@ function generateSamplePuzzle(type: string, difficulty: string) {
     }
   }
   
+  if (type === 'spatial') {
+    // Generate spatial puzzle metadata
+    return {
+      puzzle: { 
+        type, 
+        difficulty,
+        // Spatial puzzles generate their own shapes dynamically
+      },
+      solution: { type, difficulty }
+    }
+  }
+  
   // Default puzzle data
   return {
     puzzle: { type, difficulty, data: {} },

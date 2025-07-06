@@ -49,6 +49,7 @@ import { useGameStore } from '@/stores/game'
 import { supabase } from '@/config/supabase'
 import PhaserGame from '@/components/game/PhaserGame.vue'
 import PatternMatchingGame from '@/components/game/PatternMatchingGame.vue'
+import SpatialPuzzleGame from '@/components/game/SpatialPuzzleGame.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -148,8 +149,7 @@ function selectGameComponent() {
       gameComponent.value = PatternMatchingGame // Use pattern matching for now
       break
     case 'spatial':
-      // TODO: Add spatial puzzle component
-      error.value = 'Spatial puzzles coming soon!'
+      gameComponent.value = SpatialPuzzleGame
       break
     default:
       error.value = `Unknown puzzle type: ${puzzle.value.type}`

@@ -69,6 +69,11 @@ export class SpatialPuzzleScene extends Phaser.Scene {
     
     // Listen for events
     this.events.on('request-hint', () => this.showHint())
+    this.events.on('rotate-selected', () => {
+      if (this.selectedShape) {
+        this.rotateShape(this.selectedShape)
+      }
+    })
   }
 
   private createGrid() {
@@ -214,6 +219,14 @@ export class SpatialPuzzleScene extends Phaser.Scene {
       })
     })
     
+    // Also select on click
+    shape.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      this.selectedShape = shape
+      if (pointer.event.detail === 2) { // Double-click
+        this.rotateShape(shape)
+      }
+    })
+    
     shape.on('drag', (pointer: Phaser.Input.Pointer, dragX: number, dragY: number) => {
       shape.x = dragX
       shape.y = dragY
@@ -253,13 +266,6 @@ export class SpatialPuzzleScene extends Phaser.Scene {
       
       shape.setDepth(0)
       this.clearHighlights()
-    })
-    
-    // Double-click to rotate (if allowed)
-    shape.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      if (pointer.event.detail === 2) { // Double-click
-        this.rotateShape(shape)
-      }
     })
   }
 
@@ -327,6 +333,9 @@ export class SpatialPuzzleScene extends Phaser.Scene {
       
       // Update UI
       this.updateUI()
+      
+      // Emit state update
+      this.events.emit('state-update')
       
       // Check if puzzle is complete
       if (this.puzzle.isComplete()) {
