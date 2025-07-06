@@ -35,6 +35,12 @@
       @hidden="handleAchievementHidden"
       @dismiss="handleAchievementDismiss"
     />
+    
+    <!-- Tutorial Overlay -->
+    <TutorialOverlay
+      @tutorial-complete="handleTutorialComplete"
+      @tutorial-skip="handleTutorialSkip"
+    />
   </div>
 </template>
 
@@ -49,6 +55,7 @@ import type { Achievement } from '@/types/achievements'
 // Import components
 import AppNavigation from '@/components/layout/AppNavigation.vue'
 import AchievementNotification from '@/components/achievements/AchievementNotification.vue'
+import TutorialOverlay from '@/components/tutorial/TutorialOverlay.vue'
 // import AppFooter from '@/components/layout/AppFooter.vue'
 // import ErrorModal from '@/components/modals/ErrorModal.vue'
 // import AuthModal from '@/components/modals/AuthModal.vue'
@@ -148,6 +155,26 @@ onMounted(() => {
     }
   }, 1000)
 })
+
+// Tutorial handlers
+function handleTutorialComplete() {
+  console.log('Tutorial completed')
+  // Could award an achievement for completing tutorial
+  achievementsStore.checkAndUnlockAchievements({
+    puzzleType: 'tutorial',
+    difficulty: 'easy',
+    score: 100,
+    time: 0,
+    moves: 0,
+    hints: 0,
+    mistakes: 0,
+    completed: true
+  })
+}
+
+function handleTutorialSkip() {
+  console.log('Tutorial skipped')
+}
 
 // Cleanup
 onUnmounted(() => {

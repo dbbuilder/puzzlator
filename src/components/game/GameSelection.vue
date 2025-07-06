@@ -42,7 +42,7 @@
       <!-- Puzzle Type Selection -->
       <div class="mb-8">
         <h2 class="text-2xl font-semibold mb-4">Select Puzzle Type</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 puzzle-types">
           <button
             v-for="type in puzzleTypes"
             :key="type.id"
@@ -64,7 +64,7 @@
       <!-- Difficulty Selection -->
       <div class="mb-8">
         <h2 class="text-2xl font-semibold mb-4">Select Difficulty</h2>
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 difficulty-selector">
           <button
             v-for="diff in difficulties"
             :key="diff.id"
@@ -102,7 +102,7 @@
             <option value="hard">Hard</option>
             <option value="expert">Expert</option>
           </select>
-          <router-link to="/leaderboard" class="px-4 py-2 text-purple-600 hover:text-purple-700 font-medium">
+          <router-link to="/leaderboard" class="leaderboard-link px-4 py-2 text-purple-600 hover:text-purple-700 font-medium">
             Leaderboard
           </router-link>
           <router-link to="/profile" class="px-4 py-2 text-purple-600 hover:text-purple-700 font-medium">
@@ -146,7 +146,7 @@
           @click="createNewPuzzle"
           :disabled="!selectedType || !selectedDifficulty"
           :class="[
-            'px-8 py-3 rounded-lg font-semibold text-lg transition-all',
+            'generate-button px-8 py-3 rounded-lg font-semibold text-lg transition-all',
             selectedType && selectedDifficulty
               ? 'bg-purple-600 text-white hover:bg-purple-700'
               : 'bg-gray-300 text-gray-500 cursor-not-allowed'
