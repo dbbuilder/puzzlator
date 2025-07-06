@@ -15,10 +15,12 @@ target/
 
 # Environment files
 .env
+.env.*
 .env.local
 .env.development.local
 .env.test.local
 .env.production.local
+*.env
 
 # IDE files
 .vscode/
@@ -141,3 +143,37 @@ debug-*.mjs
 *.png
 !public/**/*.png
 !src/assets/**/*.png
+
+# Secrets and credentials
+*-credentials.*
+*-secrets.*
+*.key
+*.pem
+*.p12
+*.pfx
+*_rsa
+*_dsa
+*_ed25519
+*.ppk
+
+# Database URLs and connection strings
+*-db-url.*
+*-database-url.*
+database-url.txt
+connection-string.txt
+.pgpass
+
+# Shell scripts with embedded credentials
+setup-github-secrets-local.sh
+*-with-password.sh
+*-credentials.sh
+
+# Backup files that might contain secrets
+*.backup
+*.bak
+*.old
+*.orig
+
+# Local configuration overrides
+config.local.*
+settings.local.*

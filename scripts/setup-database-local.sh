@@ -14,29 +14,26 @@ if ! command -v psql &> /dev/null; then
     exit 1
 fi
 
-# Database URLs to try
-DIRECT_URL="postgresql://postgres:Gv51076!@db.pcztbpqbpkryupfxstkd.supabase.co:5432/postgres"
-POOLER_URL="postgresql://postgres.pcztbpqbpkryupfxstkd:Gv51076!@aws-0-us-west-1.pooler.supabase.com:6543/postgres"
-
-echo "Trying direct connection first..."
-if psql "$DIRECT_URL" -c "SELECT 1;" > /dev/null 2>&1; then
-    echo "✅ Direct connection successful!"
-    DATABASE_URL="$DIRECT_URL"
+# Database URLs - get from environment or prompt
+if [ -z "$SUPABASE_DB_URL" ]; then
+    echo "Please provide your Supabase database URL:"
+    echo "(You can find this in Supabase Dashboard → Settings → Database)"
+    read -p "Database URL: " DATABASE_URL
 else
-    echo "❌ Direct connection failed"
-    echo "Trying pooler connection..."
-    if psql "$POOLER_URL" -c "SELECT 1;" > /dev/null 2>&1; then
-        echo "✅ Pooler connection successful!"
-        DATABASE_URL="$POOLER_URL"
-    else
-        echo "❌ Both connections failed"
-        echo ""
-        echo "Please check your Supabase dashboard for the correct connection string:"
-        echo "1. Go to Settings → Database"
-        echo "2. Copy the exact connection string"
-        echo "3. Run: psql 'YOUR_CONNECTION_STRING' < scripts/setup-supabase-tables.sql"
-        exit 1
-    fi
+    DATABASE_URL="$SUPABASE_DB_URL"
+fi
+
+echo "Testing connection..."
+if psql "$DATABASE_URL" -c "SELECT 1;" > /dev/null 2>&1; then
+    echo "✅ Connection successful!"
+else
+    echo "❌ Connection failed"
+    echo ""
+    echo "Please check:"
+    echo "1. Your database URL is correct"
+    echo "2. The database is not paused in Supabase"
+    echo "3. Your IP is allowed (check Supabase network restrictions)"
+    exit 1
 fi
 
 echo ""
