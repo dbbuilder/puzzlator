@@ -88,16 +88,22 @@ async function preloadResources() {
   ]
   
   const preloadPromises = criticalAssets.map(asset => {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       if (asset.endsWith('.mp3')) {
         const audio = new Audio(asset)
         audio.addEventListener('canplaythrough', resolve)
-        audio.addEventListener('error', reject)
+        audio.addEventListener('error', () => {
+          console.log(`Optional sound file not found: ${asset}`)
+          resolve(undefined) // Don't fail on missing sounds
+        })
         audio.load()
       } else {
         const img = new Image()
         img.onload = resolve
-        img.onerror = reject
+        img.onerror = () => {
+          console.log(`Optional image not found: ${asset}`)
+          resolve(undefined) // Don't fail on missing images
+        }
         img.src = asset
       }
     })
