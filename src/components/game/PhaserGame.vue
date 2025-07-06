@@ -101,6 +101,15 @@
         </div>
       </div>
     </Transition>
+    
+    <!-- Hint Display -->
+    <HintDisplay
+      :hint="currentHint"
+      :puzzle-id="gameStore.currentPuzzle?.id || 'demo'"
+      puzzle-type="sudoku"
+      @close="handleHintClose"
+      @request-next="requestNextHint"
+    />
   </div>
 </template>
 
@@ -125,6 +134,8 @@ import { useGameStore } from '@/stores/game'
 import { useUserStore } from '@/stores/user'
 import { useAchievementsStore } from '@/stores/achievements'
 import { supabase } from '@/config/supabase'
+import { HintService } from '@/services/hints'
+import HintDisplay from '@/components/game/HintDisplay.vue'
 
 const props = defineProps<{
   difficulty?: 'easy' | 'medium' | 'hard' | 'expert'
@@ -141,12 +152,14 @@ const route = useRoute()
 const router = useRouter()
 const gameStore = useGameStore()
 const userStore = useUserStore()
+const hintService = new HintService()
 
 // Refs
 const gameContainer = ref<HTMLDivElement>()
 const game = ref<Phaser.Game | null>(null)
 const scene = ref<Sudoku4x4Scene | null>(null)
 const puzzle = ref<Sudoku4x4 | null>(null)
+const currentHint = ref<any>(null)
 
 // Game state
 const isPaused = ref(false)
@@ -358,37 +371,60 @@ const redo = () => {
 }
 
 const getHint = () => {
-  if (!puzzle.value || !scene.value || hintsRemaining.value === 0) return
+  if (!puzzle.value || !scene.value) return
   
-  // Find a cell that needs a hint
+  // Check cooldown
+  const puzzleId = gameStore.currentPuzzle?.id || 'demo'
+  if (!hintService.canRequestHint(puzzleId)) {
+    toast.warning('Please wait before requesting another hint')
+    return
+  }
+  
+  // Find selected cell or first empty cell
   const state = puzzle.value.getState()
+  let targetRow = -1, targetCol = -1
+  
+  // TODO: Get selected cell from scene
+  // For now, find first empty cell
   for (let row = 0; row < 4; row++) {
     for (let col = 0; col < 4; col++) {
       if (state.grid[row][col].value === null && !state.grid[row][col].locked) {
-        const hint = puzzle.value.getHint(row, col)
-        if (hint && hint.possibleValues.length === 1) {
-          // Auto-fill if only one possibility
-          const move: PuzzleMove = {
-            row,
-            col,
-            value: hint.possibleValues[0]
-          }
-          puzzle.value.makeMove(move)
-          scene.value.updateFromPuzzleState()
-          scene.value.animateNumberPlacement(row, col, hint.possibleValues[0] as number)
-          
-          hintsRemaining.value--
-          gameStore.useHint()
-          puzzle.value.useHint()
-          
-          toast.success(`Hint: Place ${hint.possibleValues[0]} at row ${row + 1}, column ${col + 1}`)
-          return
-        }
+        targetRow = row
+        targetCol = col
+        break
       }
     }
+    if (targetRow !== -1) break
   }
   
-  toast.info('No obvious hints available. Keep trying!')
+  if (targetRow === -1) {
+    toast.info('No empty cells to hint!')
+    return
+  }
+  
+  // Get progressive hint
+  const context = puzzle.value.getHintContext(targetRow, targetCol)
+  const hint = hintService.getProgressiveHint(puzzleId, 'sudoku', context)
+  
+  if (hint) {
+    currentHint.value = hint
+    hintsRemaining.value--
+    gameStore.useHint()
+    puzzle.value.useHint()
+    
+    // Highlight cell
+    if (scene.value && hint.cellHighlight) {
+      // TODO: Implement cell highlighting in scene
+    }
+  }
+}
+
+const handleHintClose = () => {
+  currentHint.value = null
+}
+
+const requestNextHint = () => {
+  getHint()
 }
 
 const handleCompletion = async () => {

@@ -399,6 +399,12 @@ export class Sudoku4x4 implements Puzzle {
   useHint(): void {
     this.state.hintsUsed++
   }
+  
+  // Enhanced hint method for the new hint system
+  getHintContext(row: number, col: number): any {
+    const grid = this.state.grid.map(r => r.map(c => c.value))
+    return { grid, row, col }
+  }
 
   getNextMove(): PuzzleMove | null {
     // Find the cell with fewest possible values (most constrained)
