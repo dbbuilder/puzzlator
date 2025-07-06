@@ -4,6 +4,7 @@ import { createPinia } from 'pinia'
 import Toast from 'vue-toastification'
 import router from './router'
 import App from './App.vue'
+import { initSentry } from './config/sentry'
 
 // Import styles
 import './style.css'
@@ -22,6 +23,13 @@ app.use(pinia)
 // Configure router
 app.use(router)
 
+// Initialize Sentry error tracking
+initSentry({
+  app,
+  router,
+  enabled: import.meta.env.PROD || import.meta.env.VITE_SENTRY_DEBUG === 'true'
+})
+
 // Configure toast notifications
 app.use(Toast, {
   position: 'top-right',
@@ -38,10 +46,10 @@ app.use(Toast, {
   rtl: false,
 })
 
-// Global error handler
+// Global error handler (Sentry will capture these automatically)
 app.config.errorHandler = (err, instance, info) => {
   console.error('Global error:', err, info)
-  // TODO: Send to error tracking service
+  // Sentry captures this automatically via the Vue integration
 }
 
 // Initialize authentication state (using custom auth)

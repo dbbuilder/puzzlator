@@ -37,6 +37,8 @@
     "docker:status": "docker-compose --env-file .env.docker ps"
   },
   "dependencies": {
+    "@sentry/tracing": "^7.120.3",
+    "@sentry/vue": "^9.35.0",
     "@supabase/supabase-js": "^2.39.7",
     "@types/uuid": "^10.0.0",
     "@vueuse/core": "^10.7.2",

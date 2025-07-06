@@ -3,6 +3,7 @@ import { ref, computed } from 'vue'
 import { supabase } from '@/config/supabase'
 import type { User, Session } from '@supabase/supabase-js'
 import { useToast } from 'vue-toastification'
+import { setSentryUser } from '@/config/sentry'
 
 export const useAuthStore = defineStore('auth', () => {
   // State
@@ -45,12 +46,29 @@ export const useAuthStore = defineStore('auth', () => {
       if (currentSession) {
         session.value = currentSession
         user.value = currentSession.user
+        // Set Sentry user context
+        setSentryUser({
+          id: currentSession.user.id,
+          email: currentSession.user.email,
+          username: currentSession.user.user_metadata?.username
+        })
       }
 
       // Listen for auth changes
       supabase.auth.onAuthStateChange((_event, newSession) => {
         session.value = newSession
         user.value = newSession?.user || null
+        
+        // Update Sentry user context
+        if (newSession?.user) {
+          setSentryUser({
+            id: newSession.user.id,
+            email: newSession.user.email,
+            username: newSession.user.user_metadata?.username
+          })
+        } else {
+          setSentryUser(null)
+        }
       })
 
       initialized.value = true
@@ -189,6 +207,7 @@ export const useAuthStore = defineStore('auth', () => {
       // Just clear local state in demo mode
       user.value = null
       session.value = null
+      setSentryUser(null)
       toast.success('Signed out successfully')
       return { success: true }
     }
@@ -199,6 +218,7 @@ export const useAuthStore = defineStore('auth', () => {
       const { error } = await supabase.auth.signOut()
       if (error) throw error
 
+      setSentryUser(null)
       toast.success('Signed out successfully')
       return { success: true }
     } catch (error: any) {
