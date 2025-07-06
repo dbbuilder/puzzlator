@@ -1,5 +1,5 @@
 // Version information
-export const APP_VERSION = '0.3.1'
+export const APP_VERSION = '0.3.2'
 export const BUILD_TIME = new Date().toISOString()
 export const BUILD_NUMBER = Date.now()
 
