@@ -1,9 +1,19 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { mount, flushPromises } from '@vue/test-utils'
 import AchievementNotification from './AchievementNotification.vue'
 import type { Achievement } from '@/types/achievements'
 
 describe('AchievementNotification', () => {
+  // Mock Teleport for testing
+  beforeEach(() => {
+    const el = document.createElement('div')
+    el.id = 'teleport-target'
+    document.body.appendChild(el)
+  })
+  
+  afterEach(() => {
+    document.body.innerHTML = ''
+  })
   const mockAchievement: Achievement = {
     id: 'first_win',
     name: 'First Victory',
